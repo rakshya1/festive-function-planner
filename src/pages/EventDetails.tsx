@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Calendar, Clock, MapPin, Users, Share2, Bookmark, ArrowLeft, Ticket } from "lucide-react";
 import Navbar from "@/components/Navbar";
@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { EventProps } from "@/components/EventCard";
+import PurchaseTicketDialog from "@/components/PurchaseTicketDialog";
+import { toast } from "@/hooks/use-toast";
 
 // Sample event data
 const sampleEvents: Record<string, EventProps & { description: string; organizer: string; attendees: number }> = {
@@ -93,6 +95,7 @@ const sampleEvents: Record<string, EventProps & { description: string; organizer
 const EventDetails = () => {
   const { id } = useParams<{ id: string }>();
   const event = id ? sampleEvents[id] : null;
+  const [isPurchaseOpen, setIsPurchaseOpen] = useState(false);
   
   if (!event) {
     return (
@@ -116,6 +119,31 @@ const EventDetails = () => {
     month: 'long', 
     day: 'numeric' 
   });
+
+  const handleShare = () => {
+    if (navigator.share) {
+      navigator.share({
+        title: event.title,
+        text: `Check out this event: ${event.title}`,
+        url: window.location.href,
+      })
+      .catch((error) => console.log('Error sharing', error));
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+      toast({
+        title: "Link copied!",
+        description: "Event link copied to clipboard.",
+      });
+    }
+  };
+
+  const handleSave = () => {
+    // In a real app, this would save to user's bookmarks
+    toast({
+      title: "Event saved!",
+      description: "This event has been added to your saved events.",
+    });
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -191,17 +219,20 @@ const EventDetails = () => {
                 <p className="text-gray-500 dark:text-gray-400">per ticket</p>
               </div>
               
-              <Button className="w-full mb-3 gradient-bg">
+              <Button 
+                className="w-full mb-3 gradient-bg"
+                onClick={() => setIsPurchaseOpen(true)}
+              >
                 <Ticket className="h-4 w-4 mr-2" />
-                Register Now
+                {event.price === "Free" ? "Register Now" : "Purchase Tickets"}
               </Button>
               
               <div className="flex gap-2">
-                <Button variant="outline" className="flex-1">
+                <Button variant="outline" className="flex-1" onClick={handleShare}>
                   <Share2 className="h-4 w-4 mr-2" />
                   Share
                 </Button>
-                <Button variant="outline" className="flex-1">
+                <Button variant="outline" className="flex-1" onClick={handleSave}>
                   <Bookmark className="h-4 w-4 mr-2" />
                   Save
                 </Button>
@@ -223,6 +254,14 @@ const EventDetails = () => {
           </div>
         </div>
       </div>
+
+      <PurchaseTicketDialog
+        open={isPurchaseOpen}
+        onOpenChange={setIsPurchaseOpen}
+        eventTitle={event.title}
+        eventId={event.id}
+        price={event.price}
+      />
     </div>
   );
 };

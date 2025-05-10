@@ -1,13 +1,15 @@
 
 import React, { useState } from "react";
-import { Search, Calendar, MapPin, Filter } from "lucide-react";
+import { Search, Calendar, MapPin, Filter, DollarSign } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { Slider } from "@/components/ui/slider";
 import { format } from "date-fns";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 interface SearchBarProps {
   onSearch: (filters: SearchFilters) => void;
@@ -18,6 +20,7 @@ export interface SearchFilters {
   date: string | null;
   location: string | null;
   category: string | null;
+  priceRange?: [number, number] | null;
 }
 
 const locations = [
@@ -49,7 +52,9 @@ const SearchBar = ({ onSearch }: SearchBarProps) => {
   const [date, setDate] = useState<Date | null>(null);
   const [location, setLocation] = useState<string | null>(null);
   const [category, setCategory] = useState<string | null>(null);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 500]);
   const [isLocationOpen, setIsLocationOpen] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,7 +62,8 @@ const SearchBar = ({ onSearch }: SearchBarProps) => {
       searchTerm,
       date: date ? format(date, "yyyy-MM-dd") : null,
       location,
-      category
+      category,
+      priceRange: priceRange[0] === 0 && priceRange[1] === 500 ? null : priceRange
     });
   };
 
@@ -66,11 +72,13 @@ const SearchBar = ({ onSearch }: SearchBarProps) => {
     setDate(null);
     setLocation(null);
     setCategory(null);
+    setPriceRange([0, 500]);
     onSearch({
       searchTerm: "",
       date: null,
       location: null,
-      category: null
+      category: null,
+      priceRange: null
     });
   };
 
@@ -166,6 +174,51 @@ const SearchBar = ({ onSearch }: SearchBarProps) => {
         </div>
         
         <div className="flex gap-2">
+          <Dialog open={showFilters} onOpenChange={setShowFilters}>
+            <DialogTrigger asChild>
+              <Button variant="outline">
+                <Filter className="h-4 w-4 mr-2" />
+                Filters
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Additional Filters</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-6 py-4">
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="font-medium flex items-center">
+                      <DollarSign className="h-4 w-4 mr-2" />
+                      Price Range
+                    </h3>
+                    <div className="text-sm text-muted-foreground">
+                      ${priceRange[0]} - ${priceRange[1]}
+                    </div>
+                  </div>
+                  <Slider
+                    defaultValue={priceRange}
+                    min={0}
+                    max={500}
+                    step={5}
+                    value={priceRange}
+                    onValueChange={(value: [number, number]) => setPriceRange(value)}
+                    className="my-6"
+                  />
+                  <div className="flex justify-between text-xs text-muted-foreground">
+                    <span>Free</span>
+                    <span>$500</span>
+                  </div>
+                </div>
+              </div>
+              <div className="flex justify-end">
+                <Button onClick={() => setShowFilters(false)} className="gradient-bg">
+                  Apply Filters
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+          
           <Button type="button" variant="outline" onClick={handleReset}>
             Reset
           </Button>
