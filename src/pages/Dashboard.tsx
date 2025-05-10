@@ -1,382 +1,152 @@
 
-import React from "react";
-import { Link } from "react-router-dom";
-import { 
-  Calendar, 
-  PlusCircle, 
-  Ticket, 
-  Users, 
-  BarChart3, 
-  Settings, 
-  Edit, 
-  Trash
-} from "lucide-react";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Calendar, Users, BarChart2, MapPin } from "lucide-react";
+import StatsOverview from "@/components/dashboard/StatsOverview";
+import EventsChart from "@/components/dashboard/EventsChart";
+import UpcomingEvents from "@/components/dashboard/UpcomingEvents";
+import EventsByCategory from "@/components/dashboard/EventsByCategory";
 
-// Sample data for the dashboard
-const myEvents = [
-  {
-    id: "101",
-    title: "Product Launch Workshop",
-    date: "2025-06-20",
-    time: "2:00 PM - 5:00 PM",
-    location: "Online (Zoom)",
-    status: "Upcoming",
-    attendees: 45,
-    ticketsSold: 45,
-    revenue: 1350
+// Sample data for dashboard
+const dashboardData = {
+  totalEvents: 24,
+  activeEvents: 18,
+  totalAttendees: 458,
+  totalRevenue: 12750,
+  eventsToday: 3,
+  categoriesCount: {
+    Technology: 8,
+    Music: 5,
+    Networking: 4,
+    Sports: 3,
+    Art: 2,
+    Food: 2,
   },
-  {
-    id: "102",
-    title: "Marketing Strategy Seminar",
-    date: "2025-07-15",
-    time: "10:00 AM - 12:00 PM",
-    location: "Business Center",
-    status: "Upcoming",
-    attendees: 28,
-    ticketsSold: 28,
-    revenue: 980
-  },
-  {
-    id: "103",
-    title: "Networking Happy Hour",
-    date: "2025-05-10",
-    time: "6:00 PM - 8:00 PM",
-    location: "Downtown Lounge",
-    status: "Past",
-    attendees: 60,
-    ticketsSold: 60,
-    revenue: 900
-  }
-];
-
-const registeredEvents = [
-  {
-    id: "201",
-    title: "Tech Conference 2025",
-    date: "2025-06-15",
-    time: "9:00 AM - 5:00 PM",
-    location: "San Francisco Convention Center",
-    ticketType: "General Admission"
-  },
-  {
-    id: "202",
-    title: "Startup Networking Mixer",
-    date: "2025-06-05",
-    time: "6:30 PM - 9:00 PM",
-    location: "Downtown Innovation Hub",
-    ticketType: "VIP Access"
-  }
-];
+  registrationsOverTime: [
+    { name: 'Jan', registrations: 65 },
+    { name: 'Feb', registrations: 80 },
+    { name: 'Mar', registrations: 110 },
+    { name: 'Apr', registrations: 95 },
+    { name: 'May', registrations: 130 },
+    { name: 'Jun', registrations: 160 },
+  ],
+  eventsByMonth: [
+    { name: 'Jan', count: 5 },
+    { name: 'Feb', count: 6 },
+    { name: 'Mar', count: 8 },
+    { name: 'Apr', count: 7 },
+    { name: 'May', count: 9 },
+    { name: 'Jun', count: 12 },
+  ]
+};
 
 const Dashboard = () => {
-  const upcomingEvents = myEvents.filter(event => event.status === "Upcoming");
-  const pastEvents = myEvents.filter(event => event.status === "Past");
-  
-  // Calculate summary stats
-  const totalEvents = myEvents.length;
-  const totalAttendees = myEvents.reduce((acc, event) => acc + event.attendees, 0);
-  const totalRevenue = myEvents.reduce((acc, event) => acc + event.revenue, 0);
+  const [dateFilter, setDateFilter] = useState("all");
+  const navigate = useNavigate();
   
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Navbar />
       
-      <div className="max-w-6xl mx-auto px-6 py-8">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
-          <h1 className="text-2xl md:text-3xl font-bold">Dashboard</h1>
-          <Button asChild className="gradient-bg w-full md:w-auto">
-            <Link to="/create-event" className="flex items-center gap-1">
-              <PlusCircle className="h-4 w-4 mr-1" />
-              <span>Create New Event</span>
-            </Link>
-          </Button>
-        </div>
+      <div className="py-6 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <header className="mb-6">
+          <div className="flex items-center justify-between">
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
+            <button 
+              onClick={() => navigate('/create-event')}
+              className="gradient-bg text-white px-4 py-2 rounded-md flex items-center gap-2"
+            >
+              Create Event
+            </button>
+          </div>
+          <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+            Monitor and manage your events from a single place
+          </p>
+        </header>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                Total Events
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center">
-                <Calendar className="h-5 w-5 text-event-primary mr-2" />
-                <span className="text-2xl font-bold">{totalEvents}</span>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                Total Attendees
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center">
-                <Users className="h-5 w-5 text-event-primary mr-2" />
-                <span className="text-2xl font-bold">{totalAttendees}</span>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                Total Revenue
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center">
-                <BarChart3 className="h-5 w-5 text-event-primary mr-2" />
-                <span className="text-2xl font-bold">${totalRevenue}</span>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-        
-        <Tabs defaultValue="my-events" className="mb-8">
-          <TabsList className="grid grid-cols-2 w-full max-w-md mb-6">
-            <TabsTrigger value="my-events">My Events</TabsTrigger>
-            <TabsTrigger value="registered">Registered Events</TabsTrigger>
+        <Tabs defaultValue="overview" className="w-full">
+          <TabsList className="mb-6">
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="events">Events</TabsTrigger>
+            <TabsTrigger value="attendees">Attendees</TabsTrigger>
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
           </TabsList>
           
-          <TabsContent value="my-events">
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold">Events You're Organizing</h2>
-              </div>
+          <TabsContent value="overview" className="space-y-6">
+            <StatsOverview data={dashboardData} />
+            
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Events by Month</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <EventsChart data={dashboardData.eventsByMonth} />
+                </CardContent>
+              </Card>
               
-              <Tabs defaultValue="upcoming">
-                <TabsList>
-                  <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
-                  <TabsTrigger value="past">Past</TabsTrigger>
-                </TabsList>
-                
-                <TabsContent value="upcoming" className="pt-6">
-                  {upcomingEvents.length === 0 ? (
-                    <div className="text-center py-8">
-                      <p className="text-gray-500 dark:text-gray-400 mb-4">
-                        You don't have any upcoming events
-                      </p>
-                      <Button asChild variant="outline">
-                        <Link to="/create-event">
-                          <PlusCircle className="h-4 w-4 mr-2" />
-                          Create your first event
-                        </Link>
-                      </Button>
-                    </div>
-                  ) : (
-                    <div className="space-y-4">
-                      {upcomingEvents.map((event) => (
-                        <div key={event.id} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-                          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                            <div>
-                              <div className="flex items-center gap-2 mb-1">
-                                <h3 className="font-semibold">{event.title}</h3>
-                                <Badge variant="outline" className="bg-green-50 text-green-600 border-green-200">
-                                  {event.status}
-                                </Badge>
-                              </div>
-                              <div className="text-sm text-gray-500 dark:text-gray-400 mb-2">
-                                {new Date(event.date).toLocaleDateString()} • {event.time}
-                              </div>
-                              <div className="text-sm text-gray-500 dark:text-gray-400">
-                                {event.location}
-                              </div>
-                            </div>
-                            
-                            <div className="flex items-center gap-3">
-                              <Button variant="outline" size="sm" asChild>
-                                <Link to={`/event/${event.id}`}>
-                                  View
-                                </Link>
-                              </Button>
-                              <Button variant="outline" size="sm" className="text-blue-500 hover:text-blue-600">
-                                <Edit className="h-4 w-4" />
-                              </Button>
-                              <Button variant="outline" size="sm" className="text-red-500 hover:text-red-600">
-                                <Trash className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </div>
-                          
-                          <Separator className="my-3" />
-                          
-                          <div className="grid grid-cols-3 gap-4 text-center">
-                            <div>
-                              <div className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                                Attendees
-                              </div>
-                              <div className="font-semibold">{event.attendees}</div>
-                            </div>
-                            <div>
-                              <div className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                                Tickets Sold
-                              </div>
-                              <div className="font-semibold">{event.ticketsSold}</div>
-                            </div>
-                            <div>
-                              <div className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                                Revenue
-                              </div>
-                              <div className="font-semibold">${event.revenue}</div>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </TabsContent>
-                
-                <TabsContent value="past" className="pt-6">
-                  {pastEvents.length === 0 ? (
-                    <div className="text-center py-8">
-                      <p className="text-gray-500 dark:text-gray-400">
-                        You don't have any past events
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="space-y-4">
-                      {pastEvents.map((event) => (
-                        <div key={event.id} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-                          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                            <div>
-                              <div className="flex items-center gap-2 mb-1">
-                                <h3 className="font-semibold">{event.title}</h3>
-                                <Badge variant="outline" className="bg-gray-50 text-gray-600 border-gray-200">
-                                  {event.status}
-                                </Badge>
-                              </div>
-                              <div className="text-sm text-gray-500 dark:text-gray-400 mb-2">
-                                {new Date(event.date).toLocaleDateString()} • {event.time}
-                              </div>
-                              <div className="text-sm text-gray-500 dark:text-gray-400">
-                                {event.location}
-                              </div>
-                            </div>
-                            
-                            <div className="flex items-center gap-2">
-                              <Button variant="outline" size="sm" asChild>
-                                <Link to={`/event/${event.id}`}>
-                                  View
-                                </Link>
-                              </Button>
-                            </div>
-                          </div>
-                          
-                          <Separator className="my-3" />
-                          
-                          <div className="grid grid-cols-3 gap-4 text-center">
-                            <div>
-                              <div className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                                Attendees
-                              </div>
-                              <div className="font-semibold">{event.attendees}</div>
-                            </div>
-                            <div>
-                              <div className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                                Tickets Sold
-                              </div>
-                              <div className="font-semibold">{event.ticketsSold}</div>
-                            </div>
-                            <div>
-                              <div className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                                Revenue
-                              </div>
-                              <div className="font-semibold">${event.revenue}</div>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </TabsContent>
-              </Tabs>
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Events by Category</CardTitle>
+                </CardHeader>
+                <CardContent className="h-[300px]">
+                  <EventsByCategory data={dashboardData.categoriesCount} />
+                </CardContent>
+              </Card>
             </div>
+            
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Upcoming Events</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <UpcomingEvents />
+              </CardContent>
+            </Card>
           </TabsContent>
           
-          <TabsContent value="registered">
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold">Events You're Attending</h2>
-              </div>
-              
-              {registeredEvents.length === 0 ? (
-                <div className="text-center py-8">
-                  <p className="text-gray-500 dark:text-gray-400 mb-4">
-                    You haven't registered for any events yet
-                  </p>
-                  <Button asChild variant="outline">
-                    <Link to="/">
-                      <Calendar className="h-4 w-4 mr-2" />
-                      Explore events
-                    </Link>
-                  </Button>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {registeredEvents.map((event) => (
-                    <div key={event.id} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-                      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                        <div>
-                          <h3 className="font-semibold mb-1">{event.title}</h3>
-                          <div className="text-sm text-gray-500 dark:text-gray-400 mb-2">
-                            {new Date(event.date).toLocaleDateString()} • {event.time}
-                          </div>
-                          <div className="text-sm text-gray-500 dark:text-gray-400">
-                            {event.location}
-                          </div>
-                        </div>
-                        
-                        <div className="flex items-center gap-3">
-                          <Badge className="bg-event-primary hover:bg-event-secondary">
-                            {event.ticketType}
-                          </Badge>
-                          <Button variant="outline" size="sm" asChild>
-                            <Link to={`/event/${event.id}`}>
-                              <Ticket className="h-4 w-4 mr-2" />
-                              View Ticket
-                            </Link>
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+          <TabsContent value="events">
+            <Card>
+              <CardHeader>
+                <CardTitle>All Events</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  This tab will show a detailed list of all events with filtering options.
+                </p>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="attendees">
+            <Card>
+              <CardHeader>
+                <CardTitle>Attendee Management</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  This tab will show attendee details and registration data.
+                </p>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="analytics">
+            <Card>
+              <CardHeader>
+                <CardTitle>Detailed Analytics</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">
+                  This tab will show detailed analytics about events, attendees, and revenue.
+                </p>
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
-        
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Settings className="h-5 w-5 text-event-primary" />
-              Account Settings
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-gray-500 dark:text-gray-400 mb-4">
-              Manage your profile, notification preferences, and account security.
-            </p>
-            <Button variant="outline">
-              Manage Settings
-            </Button>
-          </CardContent>
-        </Card>
       </div>
     </div>
   );
