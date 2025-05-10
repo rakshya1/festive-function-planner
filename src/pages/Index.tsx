@@ -1,7 +1,7 @@
 
 import React, { useState } from "react";
 import Navbar from "@/components/Navbar";
-import SearchBar from "@/components/SearchBar";
+import SearchBar, { SearchFilters } from "@/components/SearchBar";
 import EventCard, { EventProps } from "@/components/EventCard";
 import { Button } from "@/components/ui/button";
 
@@ -77,17 +77,37 @@ const Index = () => {
   const [filteredEvents, setFilteredEvents] = useState(sampleEvents);
   const [activeCategory, setActiveCategory] = useState("All");
   
-  const handleSearch = (searchTerm: string) => {
-    if (!searchTerm.trim()) {
-      setFilteredEvents(sampleEvents);
-      return;
+  const handleSearch = (filters: SearchFilters) => {
+    let filtered = [...sampleEvents];
+    
+    // Filter by search term (title, location, category)
+    if (filters.searchTerm?.trim()) {
+      const term = filters.searchTerm.toLowerCase();
+      filtered = filtered.filter(event => 
+        event.title.toLowerCase().includes(term) ||
+        event.location.toLowerCase().includes(term) ||
+        event.category.toLowerCase().includes(term)
+      );
     }
     
-    const filtered = sampleEvents.filter(event => 
-      event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      event.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      event.category.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    // Filter by date
+    if (filters.date) {
+      filtered = filtered.filter(event => event.date === filters.date);
+    }
+    
+    // Filter by location
+    if (filters.location) {
+      filtered = filtered.filter(event => 
+        event.location.includes(filters.location!)
+      );
+    }
+    
+    // Filter by category (only if not already filtered by category button)
+    if (filters.category && activeCategory === "All") {
+      filtered = filtered.filter(event => 
+        event.category === filters.category
+      );
+    }
     
     setFilteredEvents(filtered);
   };
