@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
+import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart";
 
 interface EventsByCategoryProps {
   data: {
@@ -8,6 +9,7 @@ interface EventsByCategoryProps {
   };
 }
 
+// Array of colors for the pie chart segments
 const COLORS = ['#9b87f5', '#7E69AB', '#6E59A5', '#D6BCFA', '#8B5CF6', '#D946EF'];
 
 const EventsByCategory = ({ data }: EventsByCategoryProps) => {
@@ -16,8 +18,20 @@ const EventsByCategory = ({ data }: EventsByCategoryProps) => {
     value: data[key],
   }));
 
+  // Create config object for the chart
+  const chartConfig = chartData.reduce((acc, item, index) => {
+    acc[item.name] = { 
+      label: item.name,
+      theme: {
+        light: COLORS[index % COLORS.length],
+        dark: COLORS[index % COLORS.length]
+      }
+    };
+    return acc;
+  }, {} as Record<string, any>);
+
   return (
-    <ResponsiveContainer width="100%" height="100%">
+    <ChartContainer config={chartConfig} className="w-full h-full">
       <PieChart>
         <Pie
           data={chartData}
@@ -25,21 +39,21 @@ const EventsByCategory = ({ data }: EventsByCategoryProps) => {
           cy="50%"
           labelLine={false}
           outerRadius={80}
-          fill="#8884d8"
           dataKey="value"
+          nameKey="name"
           label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
         >
           {chartData.map((entry, index) => (
-            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+            <Cell 
+              key={`cell-${index}`} 
+              fill={`var(--color-${entry.name})`} 
+            />
           ))}
         </Pie>
-        <Tooltip 
-          formatter={(value) => [`${value} events`, 'Count']}
-          contentStyle={{ background: '#fff', border: '1px solid #f0f0f0', borderRadius: '8px', padding: '8px' }}
-        />
+        <Tooltip content={<ChartTooltipContent />} />
         <Legend layout="vertical" verticalAlign="middle" align="right" />
       </PieChart>
-    </ResponsiveContainer>
+    </ChartContainer>
   );
 };
 

@@ -4,11 +4,12 @@ import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calendar, Users, BarChart2, MapPin } from "lucide-react";
+import { Calendar, Users, BarChart2, MapPin, Mail } from "lucide-react";
 import StatsOverview from "@/components/dashboard/StatsOverview";
 import EventsChart from "@/components/dashboard/EventsChart";
 import UpcomingEvents from "@/components/dashboard/UpcomingEvents";
 import EventsByCategory from "@/components/dashboard/EventsByCategory";
+import EmailNotifications from "@/components/dashboard/EmailNotifications";
 
 // Sample data for dashboard
 const dashboardData = {
@@ -72,6 +73,7 @@ const Dashboard = () => {
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="events">Events</TabsTrigger>
             <TabsTrigger value="attendees">Attendees</TabsTrigger>
+            <TabsTrigger value="communications">Communications</TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
           </TabsList>
           
@@ -132,6 +134,26 @@ const Dashboard = () => {
                 </p>
               </CardContent>
             </Card>
+          </TabsContent>
+          
+          <TabsContent value="communications">
+            <div className="space-y-6">
+              <EmailNotifications />
+              
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Mail className="h-5 w-5" />
+                    Email Templates
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground">
+                    Manage your email templates for different notification types. This feature would allow customizing templates.
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
           
           <TabsContent value="analytics">
