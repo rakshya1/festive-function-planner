@@ -79,6 +79,16 @@
   }
 }
 
+/* Responsive utilities */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
 .event-card {
   @apply transition-all duration-200 hover:shadow-lg hover:-translate-y-1;
 }

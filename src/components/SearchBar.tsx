@@ -83,31 +83,34 @@ const SearchBar = ({ onSearch }: SearchBarProps) => {
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto">
+    <div className="w-full max-w-5xl mx-auto px-2 sm:px-0">
       <form 
         onSubmit={handleSubmit}
-        className="flex flex-col md:flex-row gap-3 bg-white dark:bg-gray-800 rounded-lg p-2 shadow-md"
+        className="flex flex-col lg:flex-row gap-2 sm:gap-3 bg-white dark:bg-gray-800 rounded-lg p-2 sm:p-3 shadow-lg"
       >
-        <div className="flex-1 flex items-center gap-2 border-b md:border-b-0 md:border-r border-gray-200 dark:border-gray-700 pb-2 md:pb-0 md:pr-3">
-          <Search className="h-5 w-5 text-gray-400" />
+        {/* Main Search Input - Full width on mobile */}
+        <div className="flex-1 flex items-center gap-2 border-b lg:border-b-0 lg:border-r border-gray-200 dark:border-gray-700 pb-2 lg:pb-0 lg:pr-3">
+          <Search className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400 flex-shrink-0" />
           <Input 
             type="text" 
             placeholder="Search events..." 
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="border-none shadow-none focus-visible:ring-0 text-base"
+            className="border-none shadow-none focus-visible:ring-0 text-sm sm:text-base"
           />
         </div>
         
-        <div className="flex-1 flex items-center gap-2 border-b md:border-b-0 md:border-r border-gray-200 dark:border-gray-700 pb-2 md:pb-0 md:px-3">
+        {/* Date Picker - Hidden on mobile, shown in filters dialog */}
+        <div className="hidden lg:flex flex-1 items-center gap-2 border-r border-gray-200 dark:border-gray-700 px-3">
           <Popover>
             <PopoverTrigger asChild>
               <Button 
                 variant="outline" 
-                className={`w-full justify-start text-left font-normal ${!date ? 'text-muted-foreground' : ''}`}
+                className={`w-full justify-start text-left font-normal text-sm ${!date ? 'text-muted-foreground' : ''}`}
+                size="sm"
               >
                 <Calendar className="mr-2 h-4 w-4" />
-                {date ? format(date, "PPP") : "Select date"}
+                {date ? format(date, "MMM dd") : "Date"}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
@@ -121,16 +124,18 @@ const SearchBar = ({ onSearch }: SearchBarProps) => {
           </Popover>
         </div>
         
-        <div className="flex-1 flex items-center gap-2 pb-2 md:pb-0 md:px-3">
+        {/* Location Picker - Hidden on mobile, shown in filters dialog */}
+        <div className="hidden lg:flex flex-1 items-center gap-2 px-3">
           <Popover open={isLocationOpen} onOpenChange={setIsLocationOpen}>
             <PopoverTrigger asChild>
               <Button 
                 variant="outline" 
-                className={`w-full justify-start text-left font-normal ${!location ? 'text-muted-foreground' : ''}`}
+                className={`w-full justify-start text-left font-normal text-sm ${!location ? 'text-muted-foreground' : ''}`}
+                size="sm"
                 onClick={() => setIsLocationOpen(true)}
               >
                 <MapPin className="mr-2 h-4 w-4" />
-                {location || "Select location"}
+                {location || "Location"}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-[200px] p-0">
@@ -158,37 +163,109 @@ const SearchBar = ({ onSearch }: SearchBarProps) => {
           </Popover>
         </div>
         
-        <div className="flex-1 flex items-center gap-2 pb-2 md:pb-0 md:px-3">
-          <Select value={category || ""} onValueChange={setCategory}>
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select category" />
-            </SelectTrigger>
-            <SelectContent>
-              {categories.map((cat) => (
-                <SelectItem key={cat} value={cat}>
-                  {cat}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        
-        <div className="flex gap-2">
+        {/* Action Buttons - Responsive layout */}
+        <div className="flex gap-2 pt-2 lg:pt-0">
+          {/* Advanced Filters Dialog - Always visible */}
           <Dialog open={showFilters} onOpenChange={setShowFilters}>
             <DialogTrigger asChild>
-              <Button variant="outline">
+              <Button variant="outline" size="sm" className="lg:hidden flex-1">
                 <Filter className="h-4 w-4 mr-2" />
-                Filters
+                <span className="text-sm">Filters</span>
               </Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogTrigger asChild>
+              <Button variant="outline" size="sm" className="hidden lg:flex">
+                <Filter className="h-4 w-4 mr-2" />
+                More
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-md">
               <DialogHeader>
-                <DialogTitle>Additional Filters</DialogTitle>
+                <DialogTitle>Search Filters</DialogTitle>
               </DialogHeader>
               <div className="space-y-6 py-4">
+                {/* Mobile Date Picker */}
+                <div className="lg:hidden">
+                  <label className="text-sm font-medium mb-2 block">Date</label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button 
+                        variant="outline" 
+                        className={`w-full justify-start text-left font-normal ${!date ? 'text-muted-foreground' : ''}`}
+                      >
+                        <Calendar className="mr-2 h-4 w-4" />
+                        {date ? format(date, "PPP") : "Select date"}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <CalendarComponent
+                        mode="single"
+                        selected={date}
+                        onSelect={setDate}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+                
+                {/* Mobile Location Picker */}
+                <div className="lg:hidden">
+                  <label className="text-sm font-medium mb-2 block">Location</label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button 
+                        variant="outline" 
+                        className={`w-full justify-start text-left font-normal ${!location ? 'text-muted-foreground' : ''}`}
+                      >
+                        <MapPin className="mr-2 h-4 w-4" />
+                        {location || "Select location"}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[200px] p-0">
+                      <Command>
+                        <CommandInput placeholder="Search location..." />
+                        <CommandEmpty>No location found.</CommandEmpty>
+                        <CommandGroup>
+                          <CommandList>
+                            {locations.map((city) => (
+                              <CommandItem
+                                key={city}
+                                value={city}
+                                onSelect={(value) => {
+                                  setLocation(value);
+                                }}
+                              >
+                                {city}
+                              </CommandItem>
+                            ))}
+                          </CommandList>
+                        </CommandGroup>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                </div>
+                
+                {/* Category Selection */}
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Category</label>
+                  <Select value={category || ""} onValueChange={setCategory}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {categories.map((cat) => (
+                        <SelectItem key={cat} value={cat}>
+                          {cat}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                {/* Price Range */}
                 <div>
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="font-medium flex items-center">
+                    <h3 className="font-medium flex items-center text-sm">
                       <DollarSign className="h-4 w-4 mr-2" />
                       Price Range
                     </h3>
@@ -211,19 +288,26 @@ const SearchBar = ({ onSearch }: SearchBarProps) => {
                   </div>
                 </div>
               </div>
-              <div className="flex justify-end">
-                <Button onClick={() => setShowFilters(false)} className="gradient-bg">
+              <div className="flex justify-end gap-2">
+                <Button variant="outline" onClick={handleReset} size="sm">
+                  Reset
+                </Button>
+                <Button onClick={() => setShowFilters(false)} className="gradient-bg" size="sm">
                   Apply Filters
                 </Button>
               </div>
             </DialogContent>
           </Dialog>
           
-          <Button type="button" variant="outline" onClick={handleReset}>
-            Reset
-          </Button>
-          <Button type="submit" className="gradient-bg">
-            Search
+          {/* Search Button - Responsive */}
+          <Button 
+            type="submit" 
+            className="gradient-bg flex-1 lg:flex-none text-sm sm:text-base"
+            size="sm"
+          >
+            <Search className="h-4 w-4 mr-2 lg:mr-1" />
+            <span className="hidden sm:inline">Search</span>
+            <span className="sm:hidden">Go</span>
           </Button>
         </div>
       </form>

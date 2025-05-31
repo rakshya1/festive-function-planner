@@ -131,32 +131,43 @@ const Index = () => {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Navbar />
       
-      <section className="py-10 px-6 md:px-10 gradient-bg text-white">
+      {/* Hero Section - Enhanced for better responsiveness */}
+      <section className="py-8 sm:py-12 lg:py-16 px-4 sm:px-6 md:px-10 gradient-bg text-white">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-10 animate-fade-in">
-            <h1 className="text-3xl md:text-5xl font-bold mb-4">Find Your Next Experience</h1>
-            <p className="text-lg md:text-xl opacity-90 max-w-2xl mx-auto">
+          <div className="text-center mb-8 sm:mb-10 lg:mb-12 animate-fade-in">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4 leading-tight">
+              Find Your Next Experience
+            </h1>
+            <p className="text-base sm:text-lg md:text-xl opacity-90 max-w-2xl mx-auto px-4">
               Discover and join the best events happening around you
             </p>
           </div>
           
-          <SearchBar onSearch={handleSearch} />
+          {/* Responsive Search Bar Container */}
+          <div className="w-full">
+            <SearchBar onSearch={handleSearch} />
+          </div>
         </div>
       </section>
       
-      <section className="py-10 px-6 md:px-10">
+      {/* Events Section - Enhanced spacing and responsiveness */}
+      <section className="py-8 sm:py-10 lg:py-12 px-4 sm:px-6 md:px-10">
         <div className="max-w-6xl mx-auto">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-semibold">Upcoming Events</h2>
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-4">
+            <h2 className="text-xl sm:text-2xl font-semibold">Upcoming Events</h2>
           </div>
           
-          <div className="mb-8 overflow-x-auto">
-            <div className="flex gap-2 pb-2">
+          {/* Responsive Category Filters */}
+          <div className="mb-6 sm:mb-8">
+            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
               {categories.map(category => (
                 <Button 
                   key={category}
                   variant={activeCategory === category ? "default" : "outline"}
-                  className={activeCategory === category ? "gradient-bg" : ""}
+                  className={`whitespace-nowrap flex-shrink-0 text-xs sm:text-sm ${
+                    activeCategory === category ? "gradient-bg" : ""
+                  }`}
+                  size="sm"
                   onClick={() => filterByCategory(category)}
                 >
                   {category}
@@ -165,13 +176,16 @@ const Index = () => {
             </div>
           </div>
           
+          {/* Events Grid */}
           {filteredEvents.length === 0 ? (
             <div className="text-center py-12">
-              <h3 className="text-xl font-medium mb-2">No events found</h3>
-              <p className="text-gray-500 dark:text-gray-400">Try adjusting your search or filters</p>
+              <h3 className="text-lg sm:text-xl font-medium mb-2">No events found</h3>
+              <p className="text-gray-500 dark:text-gray-400 text-sm sm:text-base">
+                Try adjusting your search or filters
+              </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {filteredEvents.map(event => (
                 <EventCard key={event.id} {...event} />
               ))}
