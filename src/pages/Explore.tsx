@@ -1,12 +1,10 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
-import SearchBar, { SearchFilters } from "@/components/SearchBar";
-import EventCard, { EventProps } from "@/components/EventCard";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { MapPin, Calendar, Users, TrendingUp } from "lucide-react";
+import ExploreFilters from "@/components/explore/ExploreFilters";
+import ExploreHeader from "@/components/explore/ExploreHeader";
+import ExploreContent from "@/components/explore/ExploreContent";
+import { EventProps } from "@/components/EventCard";
 
 // Extended sample events data for explore page
 const exploreEvents: EventProps[] = [
@@ -92,28 +90,38 @@ const exploreEvents: EventProps[] = [
   }
 ];
 
-const categories = [
-  "All", "Technology", "Music", "Networking", "Sports", "Art", "Food", "Business"
-];
-
-const featuredCategories = [
-  { name: "Technology", count: 12, icon: TrendingUp },
-  { name: "Music", count: 8, icon: Users },
-  { name: "Art", count: 15, icon: Calendar },
-  { name: "Food", count: 6, icon: MapPin }
-];
+export interface ExploreFilters {
+  searchTerm: string;
+  categories: string[];
+  dateRange: { start: Date | null; end: Date | null };
+  priceRange: [number, number];
+  location: string;
+  radius: number;
+  availability: string;
+  sortBy: string;
+}
 
 const Explore = () => {
   const [filteredEvents, setFilteredEvents] = useState(exploreEvents);
-  const [activeCategory, setActiveCategory] = useState("All");
-  const [sortBy, setSortBy] = useState("date");
-  
-  const handleSearch = (filters: SearchFilters) => {
+  const [filters, setFilters] = useState<ExploreFilters>({
+    searchTerm: "",
+    categories: [],
+    dateRange: { start: null, end: null },
+    priceRange: [0, 500],
+    location: "",
+    radius: 25,
+    availability: "all",
+    sortBy: "date"
+  });
+  const [viewMode, setViewMode] = useState<"grid" | "list" | "map">("grid");
+  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+
+  const applyFilters = (newFilters: ExploreFilters) => {
     let filtered = [...exploreEvents];
     
-    // Filter by search term
-    if (filters.searchTerm?.trim()) {
-      const term = filters.searchTerm.toLowerCase();
+    // Apply search term filter
+    if (newFilters.searchTerm.trim()) {
+      const term = newFilters.searchTerm.toLowerCase();
       filtered = filtered.filter(event => 
         event.title.toLowerCase().includes(term) ||
         event.location.toLowerCase().includes(term) ||
@@ -121,56 +129,48 @@ const Explore = () => {
       );
     }
     
-    // Filter by date
-    if (filters.date) {
-      filtered = filtered.filter(event => event.date === filters.date);
-    }
-    
-    // Filter by location
-    if (filters.location) {
+    // Apply category filter
+    if (newFilters.categories.length > 0) {
       filtered = filtered.filter(event => 
-        event.location.includes(filters.location!)
+        newFilters.categories.includes(event.category)
       );
     }
     
-    // Filter by category
-    if (filters.category && activeCategory === "All") {
-      filtered = filtered.filter(event => 
-        event.category === filters.category
-      );
-    }
-    
-    // Filter by price range
-    if (filters.priceRange) {
+    // Apply date range filter
+    if (newFilters.dateRange.start || newFilters.dateRange.end) {
       filtered = filtered.filter(event => {
-        if (event.price === "Free") return filters.priceRange![0] === 0;
-        const price = parseFloat(event.price!);
-        return price >= filters.priceRange![0] && price <= filters.priceRange![1];
+        const eventDate = new Date(event.date);
+        const start = newFilters.dateRange.start;
+        const end = newFilters.dateRange.end;
+        
+        if (start && end) {
+          return eventDate >= start && eventDate <= end;
+        } else if (start) {
+          return eventDate >= start;
+        } else if (end) {
+          return eventDate <= end;
+        }
+        return true;
       });
     }
     
-    setFilteredEvents(filtered);
-  };
-  
-  const filterByCategory = (category: string) => {
-    setActiveCategory(category);
+    // Apply price range filter
+    filtered = filtered.filter(event => {
+      if (event.price === "Free") return newFilters.priceRange[0] === 0;
+      const price = parseFloat(event.price!);
+      return price >= newFilters.priceRange[0] && price <= newFilters.priceRange[1];
+    });
     
-    if (category === "All") {
-      setFilteredEvents(exploreEvents);
-      return;
+    // Apply location filter
+    if (newFilters.location.trim()) {
+      filtered = filtered.filter(event => 
+        event.location.toLowerCase().includes(newFilters.location.toLowerCase())
+      );
     }
     
-    const filtered = exploreEvents.filter(event => 
-      event.category === category
-    );
-    
-    setFilteredEvents(filtered);
-  };
-  
-  const sortEvents = (sortType: string) => {
-    setSortBy(sortType);
-    const sorted = [...filteredEvents].sort((a, b) => {
-      switch (sortType) {
+    // Apply sorting
+    filtered.sort((a, b) => {
+      switch (newFilters.sortBy) {
         case "date":
           return new Date(a.date).getTime() - new Date(b.date).getTime();
         case "price":
@@ -179,118 +179,66 @@ const Explore = () => {
           return priceA - priceB;
         case "name":
           return a.title.localeCompare(b.title);
+        case "popularity":
+          return Math.random() - 0.5; // Random for demo
         default:
           return 0;
       }
     });
-    setFilteredEvents(sorted);
+    
+    setFilteredEvents(filtered);
   };
-  
+
+  useEffect(() => {
+    applyFilters(filters);
+  }, [filters]);
+
+  const handleFiltersChange = (newFilters: ExploreFilters) => {
+    setFilters(newFilters);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Navbar />
       
-      <section className="py-8 px-6 md:px-10 bg-white dark:bg-gray-800 border-b">
-        <div className="max-w-6xl mx-auto">
-          <div className="mb-6">
-            <h1 className="text-3xl md:text-4xl font-bold mb-2">Explore Events</h1>
-            <p className="text-gray-600 dark:text-gray-300">
-              Discover amazing events happening in your area and beyond
-            </p>
-          </div>
-          
-          <SearchBar onSearch={handleSearch} />
+      <div className="flex">
+        {/* Sidebar Filters */}
+        <div className={`
+          fixed inset-y-0 left-0 z-50 w-80 bg-white dark:bg-gray-800 shadow-lg transform transition-transform duration-300 ease-in-out
+          ${isFiltersOpen ? 'translate-x-0' : '-translate-x-full'}
+          lg:relative lg:translate-x-0 lg:block
+        `}>
+          <ExploreFilters
+            filters={filters}
+            onFiltersChange={handleFiltersChange}
+            onClose={() => setIsFiltersOpen(false)}
+          />
         </div>
-      </section>
-      
-      <section className="py-8 px-6 md:px-10">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-            {featuredCategories.map((category) => (
-              <Card key={category.name} className="cursor-pointer hover:shadow-md transition-shadow">
-                <CardHeader className="pb-2">
-                  <CardTitle className="flex items-center gap-2 text-sm">
-                    <category.icon className="h-4 w-4" />
-                    {category.name}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-2xl font-bold">{category.count}</p>
-                  <p className="text-sm text-gray-500">events</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+
+        {/* Main Content */}
+        <div className="flex-1 lg:ml-0">
+          <ExploreHeader
+            filteredEvents={filteredEvents}
+            viewMode={viewMode}
+            onViewModeChange={setViewMode}
+            onToggleFilters={() => setIsFiltersOpen(!isFiltersOpen)}
+          />
           
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-            <div className="flex flex-wrap gap-2">
-              {categories.map(category => (
-                <Button 
-                  key={category}
-                  variant={activeCategory === category ? "default" : "outline"}
-                  className={activeCategory === category ? "gradient-bg" : ""}
-                  onClick={() => filterByCategory(category)}
-                  size="sm"
-                >
-                  {category}
-                </Button>
-              ))}
-            </div>
-            
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-500">Sort by:</span>
-              <Button
-                variant={sortBy === "date" ? "default" : "outline"}
-                onClick={() => sortEvents("date")}
-                size="sm"
-              >
-                Date
-              </Button>
-              <Button
-                variant={sortBy === "price" ? "default" : "outline"}
-                onClick={() => sortEvents("price")}
-                size="sm"
-              >
-                Price
-              </Button>
-              <Button
-                variant={sortBy === "name" ? "default" : "outline"}
-                onClick={() => sortEvents("name")}
-                size="sm"
-              >
-                Name
-              </Button>
-            </div>
-          </div>
-          
-          <div className="flex justify-between items-center mb-6">
-            <div className="flex items-center gap-2">
-              <Badge variant="outline">{filteredEvents.length} events found</Badge>
-              {activeCategory !== "All" && (
-                <Badge className="gradient-bg">{activeCategory}</Badge>
-              )}
-            </div>
-          </div>
-          
-          {filteredEvents.length === 0 ? (
-            <div className="text-center py-12">
-              <h3 className="text-xl font-medium mb-2">No events found</h3>
-              <p className="text-gray-500 dark:text-gray-400 mb-4">
-                Try adjusting your search criteria or browse all events
-              </p>
-              <Button onClick={() => filterByCategory("All")} variant="outline">
-                Show All Events
-              </Button>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {filteredEvents.map(event => (
-                <EventCard key={event.id} {...event} />
-              ))}
-            </div>
-          )}
+          <ExploreContent
+            events={filteredEvents}
+            viewMode={viewMode}
+            filters={filters}
+          />
         </div>
-      </section>
+      </div>
+
+      {/* Overlay for mobile when filters are open */}
+      {isFiltersOpen && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+          onClick={() => setIsFiltersOpen(false)}
+        />
+      )}
     </div>
   );
 };
