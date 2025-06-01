@@ -63,14 +63,32 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				// Theme-specific colors
+				// Enhanced theme colors
 				theme: {
-					primary: '#22D3EE',
-					secondary: '#14B8A6',
-					accent: '#06B6D4',
+					primary: '#C084FC',
+					secondary: '#EC4899',
+					accent: '#FBBF24',
 					success: '#10B981',
 					warning: '#F59E0B',
 					error: '#EF4444',
+				},
+				// Role-specific colors
+				role: {
+					admin: {
+						primary: '#EF4444',
+						secondary: '#EC4899',
+						accent: '#8B5CF6'
+					},
+					organizer: {
+						primary: '#3B82F6',
+						secondary: '#8B5CF6',
+						accent: '#EC4899'
+					},
+					attendee: {
+						primary: '#10B981',
+						secondary: '#14B8A6',
+						accent: '#3B82F6'
+					}
 				}
 			},
 			borderRadius: {
@@ -114,13 +132,22 @@ export default {
 						opacity: '1',
 						transform: 'translateX(0)'
 					}
+				},
+				'pulse-glow': {
+					'0%, 100%': {
+						boxShadow: '0 0 5px rgba(192, 132, 252, 0.5)'
+					},
+					'50%': {
+						boxShadow: '0 0 20px rgba(192, 132, 252, 0.8)'
+					}
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
 				'fade-in': 'fade-in 0.3s ease-out',
-				'slide-in': 'slide-in 0.3s ease-out'
+				'slide-in': 'slide-in 0.3s ease-out',
+				'pulse-glow': 'pulse-glow 2s ease-in-out infinite'
 			},
 			fontFamily: {
 				sans: ['Inter', 'sans-serif'],
