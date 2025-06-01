@@ -63,12 +63,14 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				event: {
-					primary: '#9b87f5',
-					secondary: '#7E69AB',
-					dark: '#1A1F2C',
-					light: '#D6BCFA',
-					accent: '#6E59A5',
+				// Theme-specific colors
+				theme: {
+					primary: '#22D3EE',
+					secondary: '#14B8A6',
+					accent: '#06B6D4',
+					success: '#10B981',
+					warning: '#F59E0B',
+					error: '#EF4444',
 				}
 			},
 			borderRadius: {
@@ -102,12 +104,23 @@ export default {
 						opacity: '1',
 						transform: 'translateY(0)'
 					}
+				},
+				'slide-in': {
+					'0%': {
+						opacity: '0',
+						transform: 'translateX(-20px)'
+					},
+					'100%': {
+						opacity: '1',
+						transform: 'translateX(0)'
+					}
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
-				'fade-in': 'fade-in 0.3s ease-out'
+				'fade-in': 'fade-in 0.3s ease-out',
+				'slide-in': 'slide-in 0.3s ease-out'
 			},
 			fontFamily: {
 				sans: ['Inter', 'sans-serif'],

@@ -16,16 +16,16 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 255 80% 75%;
+    --primary: 195 85% 55%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 260 31% 54%;
+    --secondary: 160 45% 45%;
     --secondary-foreground: 0 0% 100%;
 
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
 
-    --accent: 260 33% 50%;
+    --accent: 175 70% 50%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84.2% 60.2%;
@@ -33,7 +33,7 @@
 
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 255 80% 75%;
+    --ring: 195 85% 55%;
 
     --radius: 0.75rem;
   }
@@ -48,16 +48,16 @@
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 255 80% 75%;
+    --primary: 195 85% 55%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 260 31% 54%;
+    --secondary: 160 45% 45%;
     --secondary-foreground: 0 0% 100%;
 
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
 
-    --accent: 260 33% 50%;
+    --accent: 175 70% 50%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 62.8% 30.6%;
@@ -65,7 +65,7 @@
 
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
-    --ring: 255 80% 75%;
+    --ring: 195 85% 55%;
   }
 }
 
@@ -94,5 +94,33 @@
 }
 
 .gradient-bg {
-  @apply bg-gradient-to-r from-event-primary to-event-secondary;
+  @apply bg-gradient-to-r from-cyan-500 to-teal-600;
+}
+
+.auth-bg {
+  @apply bg-gradient-to-br from-cyan-50 to-teal-50 dark:from-gray-900 dark:to-gray-800;
+}
+
+.role-admin {
+  @apply bg-gradient-to-r from-purple-500 to-indigo-600;
+}
+
+.role-organizer {
+  @apply bg-gradient-to-r from-blue-500 to-cyan-600;
+}
+
+.role-attendee {
+  @apply bg-gradient-to-r from-green-500 to-teal-600;
+}
+
+.notification-success {
+  @apply bg-green-50 border-green-200 text-green-800 dark:bg-green-900/20 dark:border-green-800 dark:text-green-200;
+}
+
+.notification-warning {
+  @apply bg-yellow-50 border-yellow-200 text-yellow-800 dark:bg-yellow-900/20 dark:border-yellow-800 dark:text-yellow-200;
+}
+
+.notification-error {
+  @apply bg-red-50 border-red-200 text-red-800 dark:bg-red-900/20 dark:border-red-800 dark:text-red-200;
 }
