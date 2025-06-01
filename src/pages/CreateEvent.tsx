@@ -1,13 +1,15 @@
 
-import React from "react";
-import { Link } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import React, { useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { ArrowLeft, Shield, Users, UserCheck } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { format } from "date-fns";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import {
   Form,
   FormControl,
@@ -35,6 +37,7 @@ import {
 import { CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 const formSchema = z.object({
   title: z.string().min(5, {
@@ -70,6 +73,8 @@ const categories = [
 
 const CreateEvent = () => {
   const { toast } = useToast();
+  const { user, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -85,28 +90,124 @@ const CreateEvent = () => {
     },
   });
 
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
+    
+    if (user?.role === 'attendee') {
+      toast({
+        title: "Access Denied",
+        description: "Attendees can only view and register for events. Please contact an organizer to create events.",
+        variant: "destructive",
+      });
+      navigate('/explore');
+    }
+  }, [isAuthenticated, user, navigate, toast]);
+
+  const getRoleIcon = (role: string) => {
+    switch (role) {
+      case 'admin':
+        return <Shield className="h-5 w-5" />;
+      case 'organizer':
+        return <Users className="h-5 w-5" />;
+      case 'attendee':
+        return <UserCheck className="h-5 w-5" />;
+      default:
+        return null;
+    }
+  };
+
+  const getRoleBadgeClass = (role: string) => {
+    switch (role) {
+      case 'admin':
+        return 'role-admin text-white shadow-lg';
+      case 'organizer':
+        return 'role-organizer text-white shadow-lg';
+      case 'attendee':
+        return 'role-attendee text-white shadow-lg';
+      default:
+        return 'bg-gray-500 text-white';
+    }
+  };
+
+  const getPageTheme = (role: string) => {
+    switch (role) {
+      case 'admin':
+        return 'admin-bg';
+      case 'organizer':
+        return 'organizer-bg';
+      default:
+        return 'bg-gray-50 dark:bg-gray-900';
+    }
+  };
+
+  const getCardTheme = (role: string) => {
+    switch (role) {
+      case 'admin':
+        return 'admin-card';
+      case 'organizer':
+        return 'organizer-card';
+      default:
+        return 'bg-white dark:bg-gray-800';
+    }
+  };
+
+  const getCreateButtonClass = (role: string) => {
+    switch (role) {
+      case 'admin':
+        return 'bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white shadow-lg';
+      case 'organizer':
+        return 'bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white shadow-lg';
+      default:
+        return 'gradient-bg';
+    }
+  };
+
   function onSubmit(values: z.infer<typeof formSchema>) {
     // Would typically save to a database here
     console.log(values);
     
     toast({
       title: "Event Created!",
-      description: "Your event has been successfully created.",
+      description: `Your event "${values.title}" has been successfully created.`,
     });
+    
+    // Navigate to dashboard after creation
+    navigate('/dashboard');
+  }
+
+  // Don't render the form if user is attendee or not authenticated
+  if (!isAuthenticated || user?.role === 'attendee') {
+    return null;
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className={`min-h-screen ${getPageTheme(user?.role || '')}`}>
       <Navbar />
       
       <div className="max-w-4xl mx-auto px-6 py-8">
-        <Link to="/" className="inline-flex items-center text-event-primary mb-6 hover:text-event-secondary">
+        <Link to="/dashboard" className="inline-flex items-center text-primary mb-6 hover:text-primary/80 transition-colors">
           <ArrowLeft className="h-4 w-4 mr-1" />
-          Back to events
+          Back to Dashboard
         </Link>
         
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 md:p-8 shadow-sm">
-          <h1 className="text-2xl md:text-3xl font-bold mb-6">Create New Event</h1>
+        <div className={`${getCardTheme(user?.role || '')} rounded-xl p-6 md:p-8 shadow-sm border`}>
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold">Create New Event</h1>
+              <p className="text-muted-foreground mt-1">
+                {user?.role === 'admin' 
+                  ? 'Create and manage events across the platform' 
+                  : 'Create and manage your own events'}
+              </p>
+            </div>
+            <Badge className={`${getRoleBadgeClass(user?.role || '')} flex items-center gap-2`}>
+              {getRoleIcon(user?.role || '')}
+              <span className="capitalize">{user?.role}</span>
+            </Badge>
+          </div>
           
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -288,7 +389,7 @@ const CreateEvent = () => {
               />
               
               <div className="flex justify-end pt-4">
-                <Button type="submit" className="gradient-bg">
+                <Button type="submit" className={`${getCreateButtonClass(user?.role || '')} hover:scale-105 transition-transform`}>
                   Create Event
                 </Button>
               </div>
