@@ -1,4 +1,3 @@
-
 import React, { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, Shield, Users, UserCheck } from "lucide-react";
@@ -329,7 +328,7 @@ const CreateEvent = () => {
                   <FormItem>
                     <FormLabel>Location</FormLabel>
                     <FormControl>
-                      <Input placeholder="Event venue or address" {...field} />
+                      <Input placeholder="Event venue or address (e.g., Kathmandu Convention Center)" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -346,7 +345,7 @@ const CreateEvent = () => {
                       <Input placeholder="Leave empty if free" {...field} />
                     </FormControl>
                     <FormDescription>
-                      Enter price in USD (e.g., 29.99). Leave empty if the event is free.
+                      Enter price in NPR (e.g., 2500). Leave empty if the event is free.
                     </FormDescription>
                     <FormMessage />
                   </FormItem>

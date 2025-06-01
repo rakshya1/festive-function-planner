@@ -6,34 +6,34 @@ import ExploreHeader from "@/components/explore/ExploreHeader";
 import ExploreContent from "@/components/explore/ExploreContent";
 import { EventProps } from "@/components/EventCard";
 
-// Extended sample events data for explore page
+// Extended sample events data for explore page - Nepal focused
 const exploreEvents: EventProps[] = [
   {
     id: "1",
     title: "Tech Conference 2025",
     date: "2025-06-15",
     time: "9:00 AM - 5:00 PM",
-    location: "San Francisco Convention Center",
+    location: "Kathmandu Convention Center",
     imageUrl: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80",
     category: "Technology",
-    price: "299"
+    price: "2500"
   },
   {
     id: "2",
     title: "Music Festival Weekend",
     date: "2025-07-22",
     time: "12:00 PM - 11:00 PM",
-    location: "Golden Gate Park",
+    location: "Tundikhel Ground, Kathmandu",
     imageUrl: "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80",
     category: "Music",
-    price: "150"
+    price: "1200"
   },
   {
     id: "3",
     title: "Startup Networking Mixer",
     date: "2025-06-05",
     time: "6:30 PM - 9:00 PM",
-    location: "Downtown Innovation Hub",
+    location: "Durbarmarg Innovation Hub",
     imageUrl: "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80",
     category: "Networking",
     price: "Free"
@@ -43,50 +43,50 @@ const exploreEvents: EventProps[] = [
     title: "Charity Run for Education",
     date: "2025-08-10",
     time: "7:00 AM - 11:00 AM",
-    location: "City Park",
+    location: "Shivapuri National Park",
     imageUrl: "https://images.unsplash.com/photo-1547483238-2cbf881a559f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80",
     category: "Sports",
-    price: "25"
+    price: "200"
   },
   {
     id: "5",
     title: "Art Exhibition Opening",
     date: "2025-06-30",
     time: "5:00 PM - 9:00 PM",
-    location: "Modern Art Gallery",
+    location: "Nepal Art Council, Babar Mahal",
     imageUrl: "https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80",
     category: "Art",
-    price: "15"
+    price: "150"
   },
   {
     id: "6",
     title: "Food & Wine Festival",
     date: "2025-07-10",
     time: "12:00 PM - 8:00 PM",
-    location: "Waterfront Plaza",
+    location: "Bhrikutimandap Exhibition Hall",
     imageUrl: "https://images.unsplash.com/photo-1527269534026-c86f4009eace?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80",
     category: "Food",
-    price: "75"
+    price: "800"
   },
   {
     id: "7",
     title: "Digital Marketing Workshop",
     date: "2025-06-20",
     time: "10:00 AM - 4:00 PM",
-    location: "Business Center Downtown",
+    location: "Hotel Yak & Yeti, Kathmandu",
     imageUrl: "https://images.unsplash.com/photo-1552664730-d307ca884978?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80",
     category: "Business",
-    price: "199"
+    price: "1800"
   },
   {
     id: "8",
     title: "Photography Masterclass",
     date: "2025-07-05",
     time: "2:00 PM - 6:00 PM",
-    location: "Creative Studio",
+    location: "Patan Durbar Square",
     imageUrl: "https://images.unsplash.com/photo-1452721226168-f75c58b6b92b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80",
     category: "Art",
-    price: "89"
+    price: "950"
   }
 ];
 

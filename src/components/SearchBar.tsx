@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Search, Calendar, MapPin, Filter, DollarSign } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -24,15 +23,15 @@ export interface SearchFilters {
 }
 
 const locations = [
-  "San Francisco",
-  "New York",
-  "Los Angeles",
-  "Chicago",
-  "Miami",
-  "Seattle",
-  "Austin",
-  "Boston",
-  "Denver"
+  "Kathmandu",
+  "Pokhara",
+  "Lalitpur",
+  "Bhaktapur",
+  "Biratnagar",
+  "Birgunj",
+  "Dharan",
+  "Butwal",
+  "Chitwan"
 ];
 
 const categories = [
@@ -52,7 +51,7 @@ const SearchBar = ({ onSearch }: SearchBarProps) => {
   const [date, setDate] = useState<Date | null>(null);
   const [location, setLocation] = useState<string | null>(null);
   const [category, setCategory] = useState<string | null>(null);
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 500]);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 5000]);
   const [isLocationOpen, setIsLocationOpen] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
 
@@ -63,7 +62,7 @@ const SearchBar = ({ onSearch }: SearchBarProps) => {
       date: date ? format(date, "yyyy-MM-dd") : null,
       location,
       category,
-      priceRange: priceRange[0] === 0 && priceRange[1] === 500 ? null : priceRange
+      priceRange: priceRange[0] === 0 && priceRange[1] === 5000 ? null : priceRange
     });
   };
 
@@ -72,7 +71,7 @@ const SearchBar = ({ onSearch }: SearchBarProps) => {
     setDate(null);
     setLocation(null);
     setCategory(null);
-    setPriceRange([0, 500]);
+    setPriceRange([0, 5000]);
     onSearch({
       searchTerm: "",
       date: null,
@@ -267,24 +266,24 @@ const SearchBar = ({ onSearch }: SearchBarProps) => {
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="font-medium flex items-center text-sm">
                       <DollarSign className="h-4 w-4 mr-2" />
-                      Price Range
+                      Price Range (NPR)
                     </h3>
                     <div className="text-sm text-muted-foreground">
-                      ${priceRange[0]} - ${priceRange[1]}
+                      रु{priceRange[0]} - रु{priceRange[1]}
                     </div>
                   </div>
                   <Slider
                     defaultValue={priceRange}
                     min={0}
-                    max={500}
-                    step={5}
+                    max={5000}
+                    step={50}
                     value={priceRange}
                     onValueChange={(value: [number, number]) => setPriceRange(value)}
                     className="my-6"
                   />
                   <div className="flex justify-between text-xs text-muted-foreground">
                     <span>Free</span>
-                    <span>$500</span>
+                    <span>रु5,000</span>
                   </div>
                 </div>
               </div>

@@ -37,7 +37,7 @@ const EventCard = ({ id, title, date, time, location, imageUrl, category, price 
           )}
           {price && (
             <Badge variant="outline" className="absolute bottom-3 right-3 bg-white/80 text-black hover:bg-white">
-              {price === "Free" ? "Free" : `$${price}`}
+              {price === "Free" ? "Free" : `रु${price}`}
             </Badge>
           )}
         </div>

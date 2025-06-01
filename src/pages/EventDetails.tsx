@@ -10,19 +10,19 @@ import { EventProps } from "@/components/EventCard";
 import PurchaseTicketDialog from "@/components/PurchaseTicketDialog";
 import { toast } from "@/hooks/use-toast";
 
-// Sample event data
+// Sample event data - Nepal focused
 const sampleEvents: Record<string, EventProps & { description: string; organizer: string; attendees: number }> = {
   "1": {
     id: "1",
     title: "Tech Conference 2025",
     date: "2025-06-15",
     time: "9:00 AM - 5:00 PM",
-    location: "San Francisco Convention Center",
+    location: "Kathmandu Convention Center",
     imageUrl: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80",
     category: "Technology",
-    price: "299",
+    price: "2500",
     description: "Join us for the biggest tech conference of the year! Network with industry leaders, attend workshops, and gain insights into the latest technology trends. This year's event features keynote speakers from major tech companies, hands-on demonstrations of new products, and opportunities to connect with peers and potential employers.",
-    organizer: "TechEvents Inc.",
+    organizer: "TechEvents Nepal",
     attendees: 1500
   },
   "2": {
@@ -30,12 +30,12 @@ const sampleEvents: Record<string, EventProps & { description: string; organizer
     title: "Music Festival Weekend",
     date: "2025-07-22",
     time: "12:00 PM - 11:00 PM",
-    location: "Golden Gate Park",
+    location: "Tundikhel Ground, Kathmandu",
     imageUrl: "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80",
     category: "Music",
-    price: "150",
+    price: "1200",
     description: "A weekend of amazing music across five stages featuring top artists and emerging talents. Food vendors, art installations, and more make this an unforgettable experience for music lovers of all genres.",
-    organizer: "SoundWave Productions",
+    organizer: "SoundWave Nepal",
     attendees: 5000
   },
   "3": {
@@ -43,12 +43,12 @@ const sampleEvents: Record<string, EventProps & { description: string; organizer
     title: "Startup Networking Mixer",
     date: "2025-06-05",
     time: "6:30 PM - 9:00 PM",
-    location: "Downtown Innovation Hub",
+    location: "Durbarmarg Innovation Hub",
     imageUrl: "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80",
     category: "Networking",
     price: "Free",
     description: "Connect with fellow entrepreneurs, investors, and industry experts at our monthly startup mixer. Share ideas, find collaborators, and expand your professional network in a casual setting.",
-    organizer: "Startup Connect",
+    organizer: "Startup Connect Nepal",
     attendees: 120
   },
   "4": {
@@ -56,12 +56,12 @@ const sampleEvents: Record<string, EventProps & { description: string; organizer
     title: "Charity Run for Education",
     date: "2025-08-10",
     time: "7:00 AM - 11:00 AM",
-    location: "City Park",
+    location: "Shivapuri National Park",
     imageUrl: "https://images.unsplash.com/photo-1547483238-2cbf881a559f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80",
     category: "Sports",
-    price: "25",
+    price: "200",
     description: "Run for a cause! All proceeds from this 5K run/walk will support educational programs for underprivileged children. Participants receive t-shirts, medals, and post-race refreshments.",
-    organizer: "Education First Foundation",
+    organizer: "Education First Nepal",
     attendees: 350
   },
   "5": {
@@ -69,12 +69,12 @@ const sampleEvents: Record<string, EventProps & { description: string; organizer
     title: "Art Exhibition Opening",
     date: "2025-06-30",
     time: "5:00 PM - 9:00 PM",
-    location: "Modern Art Gallery",
+    location: "Nepal Art Council, Babar Mahal",
     imageUrl: "https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80",
     category: "Art",
-    price: "15",
+    price: "150",
     description: "Experience the opening night of our new contemporary art exhibition featuring works from both established and emerging artists. Meet the artists, enjoy refreshments, and be among the first to view these inspiring pieces.",
-    organizer: "Modern Art Gallery",
+    organizer: "Nepal Art Council",
     attendees: 200
   },
   "6": {
@@ -82,12 +82,12 @@ const sampleEvents: Record<string, EventProps & { description: string; organizer
     title: "Food & Wine Festival",
     date: "2025-07-10",
     time: "12:00 PM - 8:00 PM",
-    location: "Waterfront Plaza",
+    location: "Bhrikutimandap Exhibition Hall",
     imageUrl: "https://images.unsplash.com/photo-1527269534026-c86f4009eace?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80",
     category: "Food",
-    price: "75",
+    price: "800",
     description: "Indulge in a day of culinary delights featuring tastings from top local restaurants and wineries. Chef demonstrations, food pairings, and live music create the perfect atmosphere for food enthusiasts.",
-    organizer: "Culinary Arts Association",
+    organizer: "Culinary Arts Nepal",
     attendees: 1200
   }
 };
