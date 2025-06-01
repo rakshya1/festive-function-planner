@@ -5,6 +5,7 @@ import { Calendar, MapPin, Clock } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 export interface EventProps {
   id: string;
@@ -37,7 +38,7 @@ const EventCard = ({ id, title, date, time, location, imageUrl, category, price 
           )}
           {price && (
             <Badge variant="outline" className="absolute bottom-3 right-3 bg-white/80 text-black hover:bg-white">
-              {price === "Free" ? "Free" : `रु${price}`}
+              {price === "Free" ? "Free" : `NPR ${price}`}
             </Badge>
           )}
         </div>
@@ -70,7 +71,5 @@ const EventCard = ({ id, title, date, time, location, imageUrl, category, price 
     </Link>
   );
 };
-
-import { Button } from "@/components/ui/button";
 
 export default EventCard;

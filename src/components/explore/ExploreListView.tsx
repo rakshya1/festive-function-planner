@@ -1,10 +1,11 @@
 
 import React from "react";
-import { Calendar, MapPin, Users, DollarSign } from "lucide-react";
+import { Calendar, MapPin, Users } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { EventProps } from "@/components/EventCard";
+import { Link } from "react-router-dom";
 
 interface ExploreListViewProps {
   events: EventProps[];
@@ -61,21 +62,18 @@ const ExploreListView = ({ events }: ExploreListViewProps) => {
                     {/* Price and Action */}
                     <div className="flex sm:flex-col items-center sm:items-end gap-3">
                       <div className="text-right">
-                        <div className="flex items-center gap-1 text-lg font-bold">
+                        <div className="text-lg font-bold">
                           {event.price === "Free" ? (
                             <span className="text-green-600">Free</span>
                           ) : (
-                            <>
-                              <DollarSign className="h-4 w-4" />
-                              <span>{event.price}</span>
-                            </>
+                            <span>NPR {event.price}</span>
                           )}
                         </div>
                         <div className="text-xs text-gray-500">per ticket</div>
                       </div>
                       
-                      <Button className="gradient-bg whitespace-nowrap">
-                        View Details
+                      <Button asChild className="gradient-bg whitespace-nowrap">
+                        <Link to={`/event/${event.id}`}>View Details</Link>
                       </Button>
                     </div>
                   </div>

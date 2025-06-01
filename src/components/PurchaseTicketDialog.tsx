@@ -39,8 +39,8 @@ const PurchaseTicketDialog = ({
       
       // Show success message
       toast({
-        title: "Purchase successful!",
-        description: `You've bought ${quantity} ticket${quantity > 1 ? 's' : ''} to ${eventTitle}.`,
+        title: "Registration successful!",
+        description: `You've registered for ${quantity} ticket${quantity > 1 ? 's' : ''} to ${eventTitle}.`,
       });
       
       if (onPurchaseComplete) {
@@ -50,8 +50,8 @@ const PurchaseTicketDialog = ({
       onOpenChange(false);
     } catch (error) {
       toast({
-        title: "Purchase failed",
-        description: "There was an error processing your payment. Please try again.",
+        title: "Registration failed",
+        description: "There was an error processing your registration. Please try again.",
         variant: "destructive"
       });
     } finally {
@@ -63,18 +63,18 @@ const PurchaseTicketDialog = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Purchase Tickets</DialogTitle>
+          <DialogTitle>Register for Event</DialogTitle>
           <DialogDescription>
             {isFree 
               ? "Register for this free event."
-              : "Complete your ticket purchase for this event."}
+              : "Complete your registration for this event."}
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="space-y-2">
             <h3 className="font-medium">{eventTitle}</h3>
             <p className="text-sm text-muted-foreground">
-              Price: {isFree ? "Free" : `$${price} per ticket`}
+              Price: {isFree ? "Free" : `NPR ${price} per ticket`}
             </p>
           </div>
 
@@ -136,7 +136,7 @@ const PurchaseTicketDialog = ({
 
           <div className="pt-2 text-right">
             <p className="font-bold text-lg">
-              Total: {isFree ? "Free" : `$${totalPrice}`}
+              Total: {isFree ? "Free" : `NPR ${totalPrice}`}
             </p>
           </div>
         </div>
@@ -153,7 +153,7 @@ const PurchaseTicketDialog = ({
             ) : (
               <>
                 <CreditCard className="mr-2 h-4 w-4" />
-                {isFree ? "Register Now" : "Pay Now"}
+                {isFree ? "Register Now" : "Register & Pay"}
               </>
             )}
           </Button>
