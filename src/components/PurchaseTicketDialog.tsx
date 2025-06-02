@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2, CreditCard } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface PurchaseTicketDialogProps {
   open: boolean;
@@ -27,9 +28,15 @@ const PurchaseTicketDialog = ({
   const [isProcessing, setIsProcessing] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const { toast } = useToast();
+  const { isAuthenticated } = useAuth();
   
   const isFree = price === "Free";
   const totalPrice = isFree ? "0" : (parseFloat(price) * quantity).toFixed(2);
+
+  // Don't render if user is not authenticated
+  if (!isAuthenticated) {
+    return null;
+  }
 
   const handlePurchase = async () => {
     try {
@@ -74,7 +81,7 @@ const PurchaseTicketDialog = ({
           <div className="space-y-2">
             <h3 className="font-medium">{eventTitle}</h3>
             <p className="text-sm text-muted-foreground">
-              Price: {isFree ? "Free" : `NPR ${price} per ticket`}
+              Price: {isFree ? "Free" : `रु ${price} per ticket`}
             </p>
           </div>
 
@@ -136,7 +143,7 @@ const PurchaseTicketDialog = ({
 
           <div className="pt-2 text-right">
             <p className="font-bold text-lg">
-              Total: {isFree ? "Free" : `NPR ${totalPrice}`}
+              Total: {isFree ? "Free" : `रु ${totalPrice}`}
             </p>
           </div>
         </div>

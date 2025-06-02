@@ -1,6 +1,5 @@
-
 import React, { useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { Calendar, Clock, MapPin, Users, Share2, Bookmark, ArrowLeft, Ticket } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
@@ -9,6 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import { EventProps } from "@/components/EventCard";
 import PurchaseTicketDialog from "@/components/PurchaseTicketDialog";
 import { toast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 // Sample event data - Nepal focused
 const sampleEvents: Record<string, EventProps & { description: string; organizer: string; attendees: number }> = {
@@ -96,6 +96,8 @@ const EventDetails = () => {
   const { id } = useParams<{ id: string }>();
   const event = id ? sampleEvents[id] : null;
   const [isPurchaseOpen, setIsPurchaseOpen] = useState(false);
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
   
   if (!event) {
     return (
@@ -120,6 +122,19 @@ const EventDetails = () => {
     day: 'numeric' 
   });
 
+  const handleRegisterClick = () => {
+    if (!isAuthenticated) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to register for this event.",
+        variant: "destructive"
+      });
+      navigate("/login");
+      return;
+    }
+    setIsPurchaseOpen(true);
+  };
+
   const handleShare = () => {
     if (navigator.share) {
       navigator.share({
@@ -138,6 +153,15 @@ const EventDetails = () => {
   };
 
   const handleSave = () => {
+    if (!isAuthenticated) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to save events.",
+        variant: "destructive"
+      });
+      navigate("/login");
+      return;
+    }
     // In a real app, this would save to user's bookmarks
     toast({
       title: "Event saved!",
@@ -214,14 +238,14 @@ const EventDetails = () => {
             <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm mb-4">
               <div className="mb-6">
                 <h3 className="text-xl font-semibold mb-1">
-                  {event.price === "Free" ? "Free" : `$${event.price}`}
+                  {event.price === "Free" ? "Free" : `रु${event.price}`}
                 </h3>
                 <p className="text-gray-500 dark:text-gray-400">per ticket</p>
               </div>
               
               <Button 
                 className="w-full mb-3 gradient-bg"
-                onClick={() => setIsPurchaseOpen(true)}
+                onClick={handleRegisterClick}
               >
                 <Ticket className="h-4 w-4 mr-2" />
                 {event.price === "Free" ? "Register Now" : "Purchase Tickets"}
@@ -255,13 +279,15 @@ const EventDetails = () => {
         </div>
       </div>
 
-      <PurchaseTicketDialog
-        open={isPurchaseOpen}
-        onOpenChange={setIsPurchaseOpen}
-        eventTitle={event.title}
-        eventId={event.id}
-        price={event.price}
-      />
+      {isAuthenticated && (
+        <PurchaseTicketDialog
+          open={isPurchaseOpen}
+          onOpenChange={setIsPurchaseOpen}
+          eventTitle={event.title}
+          eventId={event.id}
+          price={event.price}
+        />
+      )}
     </div>
   );
 };
