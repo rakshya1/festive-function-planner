@@ -1,9 +1,9 @@
-
 import React, { useState } from "react";
 import Navbar from "@/components/Navbar";
-import SearchBar, { SearchFilters } from "@/components/SearchBar";
 import EventCard, { EventProps } from "@/components/EventCard";
 import { Button } from "@/components/ui/button";
+import { Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
 
 // Sample event data - Nepal focused
 const sampleEvents: EventProps[] = [
@@ -76,13 +76,15 @@ const categories = [
 const Index = () => {
   const [filteredEvents, setFilteredEvents] = useState(sampleEvents);
   const [activeCategory, setActiveCategory] = useState("All");
+  const [searchTerm, setSearchTerm] = useState("");
   
-  const handleSearch = (filters: SearchFilters) => {
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
     let filtered = [...sampleEvents];
     
     // Filter by search term (title, location, category)
-    if (filters.searchTerm?.trim()) {
-      const term = filters.searchTerm.toLowerCase();
+    if (searchTerm?.trim()) {
+      const term = searchTerm.toLowerCase();
       filtered = filtered.filter(event => 
         event.title.toLowerCase().includes(term) ||
         event.location.toLowerCase().includes(term) ||
@@ -90,40 +92,8 @@ const Index = () => {
       );
     }
     
-    // Filter by date
-    if (filters.date) {
-      filtered = filtered.filter(event => event.date === filters.date);
-    }
-    
-    // Filter by location
-    if (filters.location) {
-      filtered = filtered.filter(event => 
-        event.location.toLowerCase().includes(filters.location!.toLowerCase())
-      );
-    }
-    
-    // Filter by category
-    if (filters.category && activeCategory === "All") {
-      filtered = filtered.filter(event => 
-        event.category === filters.category
-      );
-    }
-    
-    // Filter by price range
-    if (filters.priceRange) {
-      filtered = filtered.filter(event => {
-        if (event.price === "Free") return filters.priceRange![0] === 0;
-        const eventPrice = parseFloat(event.price);
-        return eventPrice >= filters.priceRange![0] && eventPrice <= filters.priceRange![1];
-      });
-    }
-    
     setFilteredEvents(filtered);
-    
-    // Reset category filter when searching
-    if (filters.searchTerm || filters.date || filters.location || filters.category || filters.priceRange) {
-      setActiveCategory("All");
-    }
+    setActiveCategory("All");
   };
   
   const filterByCategory = (category: string) => {
@@ -157,9 +127,26 @@ const Index = () => {
             </p>
           </div>
           
-          {/* Responsive Search Bar Container */}
-          <div className="w-full">
-            <SearchBar onSearch={handleSearch} />
+          {/* Simple Search Bar */}
+          <div className="w-full max-w-2xl mx-auto">
+            <form onSubmit={handleSearch} className="flex gap-2 bg-white dark:bg-gray-800 rounded-lg p-2 shadow-lg">
+              <div className="flex-1 flex items-center gap-2 px-3">
+                <Search className="h-5 w-5 text-gray-400 flex-shrink-0" />
+                <Input 
+                  type="text" 
+                  placeholder="Search events by name, location, or category..." 
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="border-none shadow-none focus-visible:ring-0 text-base"
+                />
+              </div>
+              <Button 
+                type="submit" 
+                className="gradient-bg px-6"
+              >
+                Search
+              </Button>
+            </form>
           </div>
         </div>
       </section>

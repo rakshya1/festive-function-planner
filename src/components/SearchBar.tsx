@@ -1,316 +1,43 @@
+
 import React, { useState } from "react";
-import { Search, Calendar, MapPin, Filter, DollarSign } from "lucide-react";
+import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
-import { Slider } from "@/components/ui/slider";
-import { format } from "date-fns";
-import { Calendar as CalendarComponent } from "@/components/ui/calendar";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 interface SearchBarProps {
-  onSearch: (filters: SearchFilters) => void;
+  onSearch: (searchTerm: string) => void;
+  placeholder?: string;
 }
 
-export interface SearchFilters {
-  searchTerm: string;
-  date: string | null;
-  location: string | null;
-  category: string | null;
-  priceRange?: [number, number] | null;
-}
-
-const locations = [
-  "Kathmandu",
-  "Pokhara",
-  "Lalitpur",
-  "Bhaktapur",
-  "Biratnagar",
-  "Birgunj",
-  "Dharan",
-  "Butwal",
-  "Chitwan"
-];
-
-const categories = [
-  "Technology",
-  "Music",
-  "Food",
-  "Art",
-  "Sports",
-  "Networking",
-  "Business",
-  "Education",
-  "Health"
-];
-
-const SearchBar = ({ onSearch }: SearchBarProps) => {
+const SearchBar = ({ onSearch, placeholder = "Search events..." }: SearchBarProps) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [date, setDate] = useState<Date | null>(null);
-  const [location, setLocation] = useState<string | null>(null);
-  const [category, setCategory] = useState<string | null>(null);
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 5000]);
-  const [isLocationOpen, setIsLocationOpen] = useState(false);
-  const [showFilters, setShowFilters] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSearch({
-      searchTerm,
-      date: date ? format(date, "yyyy-MM-dd") : null,
-      location,
-      category,
-      priceRange: priceRange[0] === 0 && priceRange[1] === 5000 ? null : priceRange
-    });
-  };
-
-  const handleReset = () => {
-    setSearchTerm("");
-    setDate(null);
-    setLocation(null);
-    setCategory(null);
-    setPriceRange([0, 5000]);
-    onSearch({
-      searchTerm: "",
-      date: null,
-      location: null,
-      category: null,
-      priceRange: null
-    });
+    onSearch(searchTerm);
   };
 
   return (
-    <div className="w-full max-w-5xl mx-auto px-2 sm:px-0">
-      <form 
-        onSubmit={handleSubmit}
-        className="flex flex-col lg:flex-row gap-2 sm:gap-3 bg-white dark:bg-gray-800 rounded-lg p-2 sm:p-3 shadow-lg"
-      >
-        {/* Main Search Input - Full width on mobile */}
-        <div className="flex-1 flex items-center gap-2 border-b lg:border-b-0 lg:border-r border-gray-200 dark:border-gray-700 pb-2 lg:pb-0 lg:pr-3">
-          <Search className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400 flex-shrink-0" />
+    <form onSubmit={handleSubmit} className="w-full max-w-2xl mx-auto">
+      <div className="flex gap-2 bg-white dark:bg-gray-800 rounded-lg p-2 shadow-lg">
+        <div className="flex-1 flex items-center gap-2 px-3">
+          <Search className="h-5 w-5 text-gray-400 flex-shrink-0" />
           <Input 
             type="text" 
-            placeholder="Search events..." 
+            placeholder={placeholder}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="border-none shadow-none focus-visible:ring-0 text-sm sm:text-base"
+            className="border-none shadow-none focus-visible:ring-0 text-base"
           />
         </div>
-        
-        {/* Date Picker - Hidden on mobile, shown in filters dialog */}
-        <div className="hidden lg:flex flex-1 items-center gap-2 border-r border-gray-200 dark:border-gray-700 px-3">
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button 
-                variant="outline" 
-                className={`w-full justify-start text-left font-normal text-sm ${!date ? 'text-muted-foreground' : ''}`}
-                size="sm"
-              >
-                <Calendar className="mr-2 h-4 w-4" />
-                {date ? format(date, "MMM dd") : "Date"}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <CalendarComponent
-                mode="single"
-                selected={date}
-                onSelect={setDate}
-                initialFocus
-              />
-            </PopoverContent>
-          </Popover>
-        </div>
-        
-        {/* Location Picker - Hidden on mobile, shown in filters dialog */}
-        <div className="hidden lg:flex flex-1 items-center gap-2 px-3">
-          <Popover open={isLocationOpen} onOpenChange={setIsLocationOpen}>
-            <PopoverTrigger asChild>
-              <Button 
-                variant="outline" 
-                className={`w-full justify-start text-left font-normal text-sm ${!location ? 'text-muted-foreground' : ''}`}
-                size="sm"
-                onClick={() => setIsLocationOpen(true)}
-              >
-                <MapPin className="mr-2 h-4 w-4" />
-                {location || "Location"}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-[200px] p-0">
-              <Command>
-                <CommandInput placeholder="Search location..." />
-                <CommandEmpty>No location found.</CommandEmpty>
-                <CommandGroup>
-                  <CommandList>
-                    {locations.map((city) => (
-                      <CommandItem
-                        key={city}
-                        value={city}
-                        onSelect={(value) => {
-                          setLocation(value);
-                          setIsLocationOpen(false);
-                        }}
-                      >
-                        {city}
-                      </CommandItem>
-                    ))}
-                  </CommandList>
-                </CommandGroup>
-              </Command>
-            </PopoverContent>
-          </Popover>
-        </div>
-        
-        {/* Action Buttons - Responsive layout */}
-        <div className="flex gap-2 pt-2 lg:pt-0">
-          {/* Advanced Filters Dialog - Always visible */}
-          <Dialog open={showFilters} onOpenChange={setShowFilters}>
-            <DialogTrigger asChild>
-              <Button variant="outline" size="sm" className="lg:hidden flex-1">
-                <Filter className="h-4 w-4 mr-2" />
-                <span className="text-sm">Filters</span>
-              </Button>
-            </DialogTrigger>
-            <DialogTrigger asChild>
-              <Button variant="outline" size="sm" className="hidden lg:flex">
-                <Filter className="h-4 w-4 mr-2" />
-                More
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-md">
-              <DialogHeader>
-                <DialogTitle>Search Filters</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-6 py-4">
-                {/* Mobile Date Picker */}
-                <div className="lg:hidden">
-                  <label className="text-sm font-medium mb-2 block">Date</label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button 
-                        variant="outline" 
-                        className={`w-full justify-start text-left font-normal ${!date ? 'text-muted-foreground' : ''}`}
-                      >
-                        <Calendar className="mr-2 h-4 w-4" />
-                        {date ? format(date, "PPP") : "Select date"}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <CalendarComponent
-                        mode="single"
-                        selected={date}
-                        onSelect={setDate}
-                        initialFocus
-                      />
-                    </PopoverContent>
-                  </Popover>
-                </div>
-                
-                {/* Mobile Location Picker */}
-                <div className="lg:hidden">
-                  <label className="text-sm font-medium mb-2 block">Location</label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button 
-                        variant="outline" 
-                        className={`w-full justify-start text-left font-normal ${!location ? 'text-muted-foreground' : ''}`}
-                      >
-                        <MapPin className="mr-2 h-4 w-4" />
-                        {location || "Select location"}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-[200px] p-0">
-                      <Command>
-                        <CommandInput placeholder="Search location..." />
-                        <CommandEmpty>No location found.</CommandEmpty>
-                        <CommandGroup>
-                          <CommandList>
-                            {locations.map((city) => (
-                              <CommandItem
-                                key={city}
-                                value={city}
-                                onSelect={(value) => {
-                                  setLocation(value);
-                                }}
-                              >
-                                {city}
-                              </CommandItem>
-                            ))}
-                          </CommandList>
-                        </CommandGroup>
-                      </Command>
-                    </PopoverContent>
-                  </Popover>
-                </div>
-                
-                {/* Category Selection */}
-                <div>
-                  <label className="text-sm font-medium mb-2 block">Category</label>
-                  <Select value={category || ""} onValueChange={setCategory}>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {categories.map((cat) => (
-                        <SelectItem key={cat} value={cat}>
-                          {cat}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                {/* Price Range */}
-                <div>
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="font-medium flex items-center text-sm">
-                      <DollarSign className="h-4 w-4 mr-2" />
-                      Price Range (NPR)
-                    </h3>
-                    <div className="text-sm text-muted-foreground">
-                      रु{priceRange[0]} - रु{priceRange[1]}
-                    </div>
-                  </div>
-                  <Slider
-                    defaultValue={priceRange}
-                    min={0}
-                    max={5000}
-                    step={50}
-                    value={priceRange}
-                    onValueChange={(value: [number, number]) => setPriceRange(value)}
-                    className="my-6"
-                  />
-                  <div className="flex justify-between text-xs text-muted-foreground">
-                    <span>Free</span>
-                    <span>रु5,000</span>
-                  </div>
-                </div>
-              </div>
-              <div className="flex justify-end gap-2">
-                <Button variant="outline" onClick={handleReset} size="sm">
-                  Reset
-                </Button>
-                <Button onClick={() => setShowFilters(false)} className="gradient-bg" size="sm">
-                  Apply Filters
-                </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
-          
-          {/* Search Button - Responsive */}
-          <Button 
-            type="submit" 
-            className="gradient-bg flex-1 lg:flex-none text-sm sm:text-base"
-            size="sm"
-          >
-            <Search className="h-4 w-4 mr-2 lg:mr-1" />
-            <span className="hidden sm:inline">Search</span>
-            <span className="sm:hidden">Go</span>
-          </Button>
-        </div>
-      </form>
-    </div>
+        <Button 
+          type="submit" 
+          className="gradient-bg px-6"
+        >
+          Search
+        </Button>
+      </div>
+    </form>
   );
 };
 
