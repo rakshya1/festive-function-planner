@@ -70,14 +70,41 @@ const Navbar = () => {
     }
   };
 
-  const navLinks = [
-    { to: "/", icon: Home, label: "Home" },
-    { to: "/explore", icon: Search, label: "Explore" },
-    ...(isAuthenticated ? [
-      { to: "/create-event", icon: Plus, label: "Create Event" },
-      { to: "/dashboard", icon: BarChart3, label: "Dashboard" },
-    ] : [])
-  ];
+  // Role-based navigation links
+  const getNavLinks = () => {
+    const baseLinks = [
+      { to: "/", icon: Home, label: "Home" },
+      { to: "/explore", icon: Search, label: "Explore" },
+    ];
+
+    if (!isAuthenticated) return baseLinks;
+
+    if (user?.role === 'attendee') {
+      // Attendees can only view and explore events
+      return baseLinks;
+    }
+
+    if (user?.role === 'organizer') {
+      // Organizers can create events but no dashboard
+      return [
+        ...baseLinks,
+        { to: "/create-event", icon: Plus, label: "Create Event" },
+      ];
+    }
+
+    if (user?.role === 'admin') {
+      // Admins have full access
+      return [
+        ...baseLinks,
+        { to: "/create-event", icon: Plus, label: "Create Event" },
+        { to: "/dashboard", icon: BarChart3, label: "Dashboard" },
+      ];
+    }
+
+    return baseLinks;
+  };
+
+  const navLinks = getNavLinks();
 
   return (
     <nav className={`${getNavbarTheme(user?.role || '')} shadow-md border-b transition-all duration-300`}>

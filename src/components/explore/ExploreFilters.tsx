@@ -39,7 +39,7 @@ const ExploreFilters = ({ filters, onFiltersChange, onClose }: ExploreFiltersPro
       searchTerm: "",
       categories: [],
       dateRange: { start: null, end: null },
-      priceRange: [0, 500],
+      priceRange: [0, 5000],
       location: "",
       radius: 25,
       availability: "all",
@@ -151,7 +151,7 @@ const ExploreFilters = ({ filters, onFiltersChange, onClose }: ExploreFiltersPro
             onChange={(e) => updateFilters({ location: e.target.value })}
           />
           <div className="space-y-2">
-            <Label className="text-sm">Radius: {filters.radius} miles</Label>
+            <Label className="text-sm">Radius: {filters.radius} km</Label>
             <Slider
               value={[filters.radius]}
               onValueChange={([value]) => updateFilters({ radius: value })}
@@ -167,19 +167,19 @@ const ExploreFilters = ({ filters, onFiltersChange, onClose }: ExploreFiltersPro
         <div className="space-y-3">
           <Label className="flex items-center gap-2">
             <DollarSign className="h-4 w-4" />
-            Price Range: ${filters.priceRange[0]} - ${filters.priceRange[1]}
+            Price Range: रु{filters.priceRange[0]} - रु{filters.priceRange[1]}
           </Label>
           <Slider
             value={filters.priceRange}
             onValueChange={(value) => updateFilters({ priceRange: value as [number, number] })}
-            max={500}
+            max={5000}
             min={0}
-            step={5}
+            step={100}
             className="w-full"
           />
           <div className="flex justify-between text-xs text-muted-foreground">
             <span>Free</span>
-            <span>$500+</span>
+            <span>रु5,000+</span>
           </div>
         </div>
 

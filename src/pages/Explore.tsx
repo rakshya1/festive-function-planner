@@ -107,7 +107,7 @@ const Explore = () => {
     searchTerm: "",
     categories: [],
     dateRange: { start: null, end: null },
-    priceRange: [0, 500],
+    priceRange: [0, 5000],
     location: "",
     radius: 25,
     availability: "all",
