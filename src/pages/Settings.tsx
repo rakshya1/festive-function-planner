@@ -17,7 +17,10 @@ import {
   Globe, 
   Trash2, 
   LogOut,
-  Settings as SettingsIcon
+  Settings as SettingsIcon,
+  Users,
+  Database,
+  Activity
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "@/hooks/use-toast";
@@ -35,6 +38,10 @@ const Settings = () => {
     eventReminders: true,
     marketingEmails: false,
     darkMode: theme === 'dark',
+    // Admin/Organizer specific settings
+    systemNotifications: user?.role === 'admin',
+    eventAnalytics: user?.role === 'organizer' || user?.role === 'admin',
+    autoApprove: user?.role === 'organizer',
   });
 
   // Redirect if not authenticated
@@ -81,7 +88,7 @@ const Settings = () => {
             Settings
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mt-2">
-            Manage your account preferences and privacy settings
+            Manage your account preferences and {user?.role === 'admin' ? 'system settings' : user?.role === 'organizer' ? 'event management settings' : 'privacy settings'}
           </p>
         </div>
 
@@ -132,7 +139,7 @@ const Settings = () => {
                     Email Notifications
                   </Label>
                   <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Receive event updates via email
+                    Receive {user?.role === 'admin' ? 'system updates' : user?.role === 'organizer' ? 'event updates' : 'event updates'} via email
                   </p>
                 </div>
                 <Switch
@@ -148,10 +155,10 @@ const Settings = () => {
                 <div>
                   <Label htmlFor="eventReminders" className="flex items-center cursor-pointer">
                     <Bell className="h-4 w-4 mr-2" />
-                    Event Reminders
+                    {user?.role === 'organizer' ? 'Event Management Alerts' : 'Event Reminders'}
                   </Label>
                   <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Get reminded about upcoming events
+                    {user?.role === 'organizer' ? 'Get alerted about event registrations and updates' : 'Get reminded about upcoming events'}
                   </p>
                 </div>
                 <Switch
@@ -161,24 +168,93 @@ const Settings = () => {
                 />
               </div>
 
-              <Separator />
+              {user?.role === 'admin' && (
+                <>
+                  <Separator />
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label htmlFor="systemNotifications" className="flex items-center cursor-pointer">
+                        <Database className="h-4 w-4 mr-2" />
+                        System Notifications
+                      </Label>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        Receive critical system alerts and maintenance updates
+                      </p>
+                    </div>
+                    <Switch
+                      id="systemNotifications"
+                      checked={settings.systemNotifications}
+                      onCheckedChange={(checked) => handleSettingChange('systemNotifications', checked)}
+                    />
+                  </div>
+                </>
+              )}
 
-              <div className="flex items-center justify-between">
-                <div>
-                  <Label htmlFor="marketingEmails" className="flex items-center cursor-pointer">
-                    <Mail className="h-4 w-4 mr-2" />
-                    Marketing Emails
-                  </Label>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Receive promotional content and offers
-                  </p>
-                </div>
-                <Switch
-                  id="marketingEmails"
-                  checked={settings.marketingEmails}
-                  onCheckedChange={(checked) => handleSettingChange('marketingEmails', checked)}
-                />
-              </div>
+              {(user?.role === 'organizer' || user?.role === 'admin') && (
+                <>
+                  <Separator />
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label htmlFor="eventAnalytics" className="flex items-center cursor-pointer">
+                        <Activity className="h-4 w-4 mr-2" />
+                        Analytics Reports
+                      </Label>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        Receive weekly analytics and performance reports
+                      </p>
+                    </div>
+                    <Switch
+                      id="eventAnalytics"
+                      checked={settings.eventAnalytics}
+                      onCheckedChange={(checked) => handleSettingChange('eventAnalytics', checked)}
+                    />
+                  </div>
+                </>
+              )}
+
+              {user?.role === 'organizer' && (
+                <>
+                  <Separator />
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label htmlFor="autoApprove" className="flex items-center cursor-pointer">
+                        <Users className="h-4 w-4 mr-2" />
+                        Auto-approve Registrations
+                      </Label>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        Automatically approve event registrations without manual review
+                      </p>
+                    </div>
+                    <Switch
+                      id="autoApprove"
+                      checked={settings.autoApprove}
+                      onCheckedChange={(checked) => handleSettingChange('autoApprove', checked)}
+                    />
+                  </div>
+                </>
+              )}
+
+              {user?.role === 'attendee' && (
+                <>
+                  <Separator />
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label htmlFor="marketingEmails" className="flex items-center cursor-pointer">
+                        <Mail className="h-4 w-4 mr-2" />
+                        Marketing Emails
+                      </Label>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        Receive promotional content and offers
+                      </p>
+                    </div>
+                    <Switch
+                      id="marketingEmails"
+                      checked={settings.marketingEmails}
+                      onCheckedChange={(checked) => handleSettingChange('marketingEmails', checked)}
+                    />
+                  </div>
+                </>
+              )}
             </CardContent>
           </Card>
 
@@ -246,6 +322,21 @@ const Settings = () => {
                   Change Password
                 </Button>
               </div>
+
+              {user?.role === 'admin' && (
+                <>
+                  <Separator />
+                  <div>
+                    <h4 className="font-medium mb-2">System Access</h4>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                      As an admin, you have elevated privileges. Ensure your account is always secure.
+                    </p>
+                    <Button variant="outline" size="sm">
+                      View Access Logs
+                    </Button>
+                  </div>
+                </>
+              )}
             </CardContent>
           </Card>
 
@@ -278,6 +369,8 @@ const Settings = () => {
                   <h4 className="font-medium text-red-600 dark:text-red-400">Delete Account</h4>
                   <p className="text-sm text-gray-500 dark:text-gray-400">
                     Permanently delete your account and all associated data
+                    {user?.role === 'organizer' && ' (including all your events)'}
+                    {user?.role === 'admin' && ' (this will require another admin to approve)'}
                   </p>
                 </div>
                 <Button variant="destructive" onClick={handleDeleteAccount}>

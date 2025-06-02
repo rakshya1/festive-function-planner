@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { User, Mail, Calendar, MapPin, Edit2, Save, X } from "lucide-react";
+import { User, Mail, Calendar, MapPin, Edit2, Save, X, Users, Activity, Settings } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "@/hooks/use-toast";
 
@@ -28,21 +28,36 @@ const Profile = () => {
     return null;
   }
 
-  // Mock user data for demonstration
-  const registeredEvents = [
-    {
-      id: "1",
-      title: "Tech Conference 2025",
-      date: "2025-06-15",
-      status: "upcoming"
-    },
-    {
-      id: "3",
-      title: "Startup Networking Mixer",
-      date: "2025-06-05",
-      status: "upcoming"
+  // Role-specific data
+  const getRoleSpecificData = () => {
+    if (user?.role === "organizer") {
+      return {
+        events: [
+          { id: "1", title: "Tech Conference 2025", attendees: 45, status: "upcoming" },
+          { id: "2", title: "Music Festival Weekend", attendees: 120, status: "published" }
+        ],
+        stats: { totalEvents: 2, totalAttendees: 165, activeEvents: 1 }
+      };
+    } else if (user?.role === "admin") {
+      return {
+        events: [
+          { id: "1", title: "System Maintenance", type: "system", status: "scheduled" },
+          { id: "2", title: "Platform Updates", type: "system", status: "completed" }
+        ],
+        stats: { totalUsers: 1250, totalEvents: 45, activeOrganizers: 12 }
+      };
+    } else {
+      return {
+        events: [
+          { id: "1", title: "Tech Conference 2025", date: "2025-06-15", status: "upcoming" },
+          { id: "3", title: "Startup Networking Mixer", date: "2025-06-05", status: "upcoming" }
+        ],
+        stats: { registeredEvents: 2, upcomingEvents: 2, pastEvents: 0 }
+      };
     }
-  ];
+  };
+
+  const roleData = getRoleSpecificData();
 
   const handleSave = async () => {
     const success = await updateProfile(formData);
@@ -68,7 +83,7 @@ const Profile = () => {
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">My Profile</h1>
           <p className="text-gray-600 dark:text-gray-400 mt-2">
-            Manage your account information and preferences
+            Manage your account information and {user?.role === "admin" ? "system" : user?.role === "organizer" ? "events" : "event registrations"}
           </p>
         </div>
 
@@ -189,36 +204,111 @@ const Profile = () => {
             </Card>
           </div>
 
-          {/* Registered Events Sidebar */}
+          {/* Role-specific Sidebar */}
           <div>
             <Card>
               <CardHeader>
-                <CardTitle>Registered Events</CardTitle>
+                <CardTitle>
+                  {user?.role === "organizer" ? "My Events" : 
+                   user?.role === "admin" ? "System Overview" : 
+                   "Registered Events"}
+                </CardTitle>
                 <CardDescription>
-                  Events you're registered for
+                  {user?.role === "organizer" ? "Events you're organizing" : 
+                   user?.role === "admin" ? "System statistics" : 
+                   "Events you're registered for"}
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                {registeredEvents.length === 0 ? (
-                  <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-4">
-                    No registered events yet
-                  </p>
-                ) : (
-                  <div className="space-y-3">
-                    {registeredEvents.map((event) => (
-                      <div key={event.id} className="p-3 border rounded-lg">
-                        <h4 className="font-medium text-sm">{event.title}</h4>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                          {new Date(event.date).toLocaleDateString()}
-                        </p>
-                        <Badge 
-                          variant={event.status === 'upcoming' ? 'default' : 'secondary'}
-                          className="mt-2"
-                        >
-                          {event.status}
-                        </Badge>
+                {user?.role === "admin" ? (
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 gap-3">
+                      <div className="p-3 border rounded-lg">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-medium">Total Users</span>
+                          <Users className="h-4 w-4 text-blue-500" />
+                        </div>
+                        <p className="text-2xl font-bold text-blue-600">{roleData.stats.totalUsers}</p>
                       </div>
-                    ))}
+                      <div className="p-3 border rounded-lg">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-medium">Total Events</span>
+                          <Activity className="h-4 w-4 text-green-500" />
+                        </div>
+                        <p className="text-2xl font-bold text-green-600">{roleData.stats.totalEvents}</p>
+                      </div>
+                      <div className="p-3 border rounded-lg">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-medium">Active Organizers</span>
+                          <Settings className="h-4 w-4 text-purple-500" />
+                        </div>
+                        <p className="text-2xl font-bold text-purple-600">{roleData.stats.activeOrganizers}</p>
+                      </div>
+                    </div>
+                  </div>
+                ) : user?.role === "organizer" ? (
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-2 mb-4">
+                      <div className="text-center p-2 bg-blue-50 dark:bg-blue-900 rounded">
+                        <p className="text-lg font-bold text-blue-600">{roleData.stats.totalEvents}</p>
+                        <p className="text-xs text-blue-500">Total Events</p>
+                      </div>
+                      <div className="text-center p-2 bg-green-50 dark:bg-green-900 rounded">
+                        <p className="text-lg font-bold text-green-600">{roleData.stats.totalAttendees}</p>
+                        <p className="text-xs text-green-500">Total Attendees</p>
+                      </div>
+                    </div>
+                    {roleData.events.length === 0 ? (
+                      <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-4">
+                        No events created yet
+                      </p>
+                    ) : (
+                      <div className="space-y-3">
+                        {roleData.events.map((event: any) => (
+                          <div key={event.id} className="p-3 border rounded-lg">
+                            <h4 className="font-medium text-sm">{event.title}</h4>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                              {event.attendees} attendees
+                            </p>
+                            <Badge 
+                              variant={event.status === 'upcoming' ? 'default' : 'secondary'}
+                              className="mt-2"
+                            >
+                              {event.status}
+                            </Badge>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="text-center p-3 bg-blue-50 dark:bg-blue-900 rounded-lg mb-4">
+                      <p className="text-lg font-bold text-blue-600">{roleData.stats.registeredEvents}</p>
+                      <p className="text-sm text-blue-500">Registered Events</p>
+                    </div>
+                    {roleData.events.length === 0 ? (
+                      <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-4">
+                        No registered events yet
+                      </p>
+                    ) : (
+                      <div className="space-y-3">
+                        {roleData.events.map((event: any) => (
+                          <div key={event.id} className="p-3 border rounded-lg">
+                            <h4 className="font-medium text-sm">{event.title}</h4>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                              {new Date(event.date).toLocaleDateString()}
+                            </p>
+                            <Badge 
+                              variant={event.status === 'upcoming' ? 'default' : 'secondary'}
+                              className="mt-2"
+                            >
+                              {event.status}
+                            </Badge>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 )}
               </CardContent>
