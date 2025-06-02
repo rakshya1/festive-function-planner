@@ -98,18 +98,32 @@ const Index = () => {
     // Filter by location
     if (filters.location) {
       filtered = filtered.filter(event => 
-        event.location.includes(filters.location!)
+        event.location.toLowerCase().includes(filters.location!.toLowerCase())
       );
     }
     
-    // Filter by category (only if not already filtered by category button)
+    // Filter by category
     if (filters.category && activeCategory === "All") {
       filtered = filtered.filter(event => 
         event.category === filters.category
       );
     }
     
+    // Filter by price range
+    if (filters.priceRange) {
+      filtered = filtered.filter(event => {
+        if (event.price === "Free") return filters.priceRange![0] === 0;
+        const eventPrice = parseFloat(event.price);
+        return eventPrice >= filters.priceRange![0] && eventPrice <= filters.priceRange![1];
+      });
+    }
+    
     setFilteredEvents(filtered);
+    
+    // Reset category filter when searching
+    if (filters.searchTerm || filters.date || filters.location || filters.category || filters.priceRange) {
+      setActiveCategory("All");
+    }
   };
   
   const filterByCategory = (category: string) => {

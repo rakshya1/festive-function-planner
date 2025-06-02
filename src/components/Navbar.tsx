@@ -1,258 +1,220 @@
 
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Badge } from "@/components/ui/badge";
-import { Home, Search, Calendar, Plus, BarChart3, User, LogOut, Settings, Bell, Menu, X, Shield, Users, UserCheck } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Calendar, Menu, X, User, Settings, LogOut } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Navbar = () => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
-    navigate('/');
+    navigate("/");
   };
 
-  const getRoleBadgeClass = (role: string) => {
-    switch (role) {
-      case 'admin':
-        return 'role-admin text-white shadow-lg';
-      case 'organizer':
-        return 'role-organizer text-white shadow-lg';
-      case 'attendee':
-        return 'role-attendee text-white shadow-lg';
-      default:
-        return 'bg-gray-500 text-white';
-    }
-  };
-
-  const getRoleIcon = (role: string) => {
-    switch (role) {
-      case 'admin':
-        return <Shield className="h-3 w-3" />;
-      case 'organizer':
-        return <Users className="h-3 w-3" />;
-      case 'attendee':
-        return <UserCheck className="h-3 w-3" />;
-      default:
-        return <User className="h-3 w-3" />;
-    }
-  };
-
-  const getNavbarTheme = (role: string) => {
-    switch (role) {
-      case 'admin':
-        return 'admin-bg border-red-200';
-      case 'organizer':
-        return 'organizer-bg border-blue-200';
-      case 'attendee':
-        return 'attendee-bg border-green-200';
-      default:
-        return 'bg-white dark:bg-gray-900';
-    }
-  };
-
-  const getLogoutButtonClass = (role: string) => {
-    switch (role) {
-      case 'admin':
-        return 'bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white shadow-lg';
-      case 'organizer':
-        return 'bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white shadow-lg';
-      case 'attendee':
-        return 'bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 text-white shadow-lg';
-      default:
-        return 'gradient-bg';
-    }
-  };
-
-  // Role-based navigation links
-  const getNavLinks = () => {
-    const baseLinks = [
-      { to: "/", icon: Home, label: "Home" },
-      { to: "/explore", icon: Search, label: "Explore" },
-    ];
-
-    if (!isAuthenticated) return baseLinks;
-
-    if (user?.role === 'attendee') {
-      // Attendees can only view and explore events
-      return baseLinks;
-    }
-
-    if (user?.role === 'organizer') {
-      // Organizers can create events but no dashboard
+  // Define navigation links based on user role
+  const getNavigationLinks = () => {
+    if (!isAuthenticated) {
       return [
-        ...baseLinks,
-        { to: "/create-event", icon: Plus, label: "Create Event" },
+        { label: "Home", href: "/" },
+        { label: "Explore", href: "/explore" }
       ];
     }
 
-    if (user?.role === 'admin') {
-      // Admins have full access
+    const baseLinks = [
+      { label: "Home", href: "/" },
+      { label: "Explore", href: "/explore" }
+    ];
+
+    if (user?.role === "attendee") {
+      return baseLinks;
+    } else if (user?.role === "organizer") {
       return [
         ...baseLinks,
-        { to: "/create-event", icon: Plus, label: "Create Event" },
-        { to: "/dashboard", icon: BarChart3, label: "Dashboard" },
+        { label: "Create Event", href: "/create-event" }
+      ];
+    } else if (user?.role === "admin") {
+      return [
+        ...baseLinks,
+        { label: "Create Event", href: "/create-event" },
+        { label: "Dashboard", href: "/dashboard" }
       ];
     }
 
     return baseLinks;
   };
 
-  const navLinks = getNavLinks();
+  const navigationLinks = getNavigationLinks();
 
   return (
-    <nav className={`${getNavbarTheme(user?.role || '')} shadow-md border-b transition-all duration-300`}>
+    <nav className="bg-white dark:bg-gray-800 shadow-sm border-b">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2 group">
-            <Calendar className="h-8 w-8 gradient-bg p-1 rounded text-white group-hover:animate-pulse-glow transition-all duration-300" />
-            <span className="text-xl font-bold gradient-bg bg-clip-text text-transparent">
+          <Link to="/" className="flex items-center space-x-2">
+            <Calendar className="h-8 w-8 text-blue-600" />
+            <span className="text-xl font-bold text-gray-900 dark:text-white">
               EventHub
             </span>
           </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            {navLinks.map(({ to, icon: Icon, label }) => (
+            {navigationLinks.map((link) => (
               <Link
-                key={to}
-                to={to}
-                className="flex items-center space-x-1 text-gray-600 hover:text-primary transition-colors hover:scale-105 transform duration-200"
+                key={link.href}
+                to={link.href}
+                className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
               >
-                <Icon className="h-4 w-4" />
-                <span>{label}</span>
+                {link.label}
               </Link>
             ))}
           </div>
 
-          {/* User Menu */}
-          <div className="flex items-center space-x-4">
+          {/* Auth Section */}
+          <div className="hidden md:flex items-center space-x-4">
             {isAuthenticated ? (
-              <>
-                {/* Notifications */}
-                <Button variant="ghost" size="icon" className="relative hover:scale-110 transition-transform">
-                  <Bell className="h-5 w-5" />
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center animate-pulse">
-                    3
-                  </span>
-                </Button>
-
-                {/* User Dropdown */}
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="flex items-center space-x-2 p-2 hover:scale-105 transition-transform">
-                      <Avatar className="h-8 w-8 ring-2 ring-primary/20">
-                        <AvatarImage src={user?.avatar} alt={user?.name} />
-                        <AvatarFallback className={getRoleBadgeClass(user?.role || '')}>
-                          {user?.name?.split(' ').map(n => n[0]).join('').toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="hidden md:block text-left">
-                        <div className="text-sm font-medium">{user?.name}</div>
-                        <Badge className={`text-xs ${getRoleBadgeClass(user?.role || '')} flex items-center gap-1`}>
-                          {getRoleIcon(user?.role || '')}
-                          {user?.role}
-                        </Badge>
-                      </div>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-56">
-                    <DropdownMenuLabel className="flex items-center gap-2">
-                      <div className="flex items-center gap-2">
-                        {getRoleIcon(user?.role || '')}
-                        <span className="capitalize">{user?.role} Account</span>
-                      </div>
-                    </DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => navigate('/profile')} className="hover:bg-muted">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src={user?.avatar} alt={user?.name} />
+                      <AvatarFallback>
+                        {user?.name?.charAt(0)?.toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56" align="end" forceMount>
+                  <div className="flex flex-col space-y-1 p-2">
+                    <p className="text-sm font-medium leading-none">{user?.name}</p>
+                    <p className="text-xs leading-none text-muted-foreground">
+                      {user?.email}
+                    </p>
+                  </div>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link to="/profile" className="cursor-pointer">
                       <User className="mr-2 h-4 w-4" />
-                      Profile
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => navigate('/settings')} className="hover:bg-muted">
+                      <span>Profile</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/settings" className="cursor-pointer">
                       <Settings className="mr-2 h-4 w-4" />
-                      Settings
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem 
-                      onClick={handleLogout}
-                      className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
-                    >
-                      <LogOut className="mr-2 h-4 w-4" />
-                      {user?.role === 'admin' ? 'Admin Logout' : 
-                       user?.role === 'organizer' ? 'Organizer Logout' : 
-                       'Sign Out'}
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </>
+                      <span>Settings</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Log out</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             ) : (
-              <div className="hidden md:flex items-center space-x-4">
-                <Button variant="ghost" onClick={() => navigate('/login')} className="hover:scale-105 transition-transform">
-                  Sign In
+              <div className="flex items-center space-x-2">
+                <Button variant="ghost" asChild>
+                  <Link to="/login">Sign In</Link>
                 </Button>
-                <Button className="gradient-bg hover:scale-105 transition-transform shadow-lg" onClick={() => navigate('/register')}>
-                  Sign Up
+                <Button asChild className="gradient-bg">
+                  <Link to="/register">Sign Up</Link>
                 </Button>
               </div>
             )}
+          </div>
 
-            {/* Mobile Menu Button */}
+          {/* Mobile menu button */}
+          <div className="md:hidden">
             <Button
               variant="ghost"
-              size="icon"
-              className="md:hidden hover:scale-110 transition-transform"
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              size="sm"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
-              {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              {isMenuOpen ? (
+                <X className="h-6 w-6" />
+              ) : (
+                <Menu className="h-6 w-6" />
+              )}
             </Button>
           </div>
         </div>
 
-        {/* Mobile Menu */}
-        {isMobileMenuOpen && (
-          <div className="md:hidden py-4 border-t animate-fade-in">
-            <div className="flex flex-col space-y-2">
-              {navLinks.map(({ to, icon: Icon, label }) => (
+        {/* Mobile Navigation */}
+        {isMenuOpen && (
+          <div className="md:hidden">
+            <div className="px-2 pt-2 pb-3 space-y-1 border-t">
+              {navigationLinks.map((link) => (
                 <Link
-                  key={to}
-                  to={to}
-                  className="flex items-center space-x-2 p-2 text-gray-600 hover:text-primary hover:bg-gray-50 rounded transition-all"
-                  onClick={() => setIsMobileMenuOpen(false)}
+                  key={link.href}
+                  to={link.href}
+                  className="block px-3 py-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                  onClick={() => setIsMenuOpen(false)}
                 >
-                  <Icon className="h-4 w-4" />
-                  <span>{label}</span>
+                  {link.label}
                 </Link>
               ))}
               
-              {!isAuthenticated && (
-                <>
-                  <Button
-                    variant="ghost"
-                    className="justify-start"
+              {isAuthenticated ? (
+                <div className="border-t pt-4 mt-4">
+                  <div className="flex items-center px-3 py-2">
+                    <Avatar className="h-8 w-8 mr-3">
+                      <AvatarImage src={user?.avatar} alt={user?.name} />
+                      <AvatarFallback>
+                        {user?.name?.charAt(0)?.toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <p className="text-sm font-medium">{user?.name}</p>
+                      <p className="text-xs text-gray-500">{user?.email}</p>
+                    </div>
+                  </div>
+                  <Link
+                    to="/profile"
+                    className="block px-3 py-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Profile
+                  </Link>
+                  <Link
+                    to="/settings"
+                    className="block px-3 py-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Settings
+                  </Link>
+                  <button
                     onClick={() => {
-                      navigate('/login');
-                      setIsMobileMenuOpen(false);
+                      handleLogout();
+                      setIsMenuOpen(false);
                     }}
+                    className="block w-full text-left px-3 py-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                  >
+                    Sign Out
+                  </button>
+                </div>
+              ) : (
+                <div className="border-t pt-4 mt-4 space-y-2">
+                  <Link
+                    to="/login"
+                    className="block px-3 py-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                    onClick={() => setIsMenuOpen(false)}
                   >
                     Sign In
-                  </Button>
-                  <Button
-                    className="gradient-bg justify-start"
-                    onClick={() => {
-                      navigate('/register');
-                      setIsMobileMenuOpen(false);
-                    }}
+                  </Link>
+                  <Link
+                    to="/register"
+                    className="block px-3 py-2 text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors"
+                    onClick={() => setIsMenuOpen(false)}
                   >
                     Sign Up
-                  </Button>
-                </>
+                  </Link>
+                </div>
               )}
             </div>
           </div>
