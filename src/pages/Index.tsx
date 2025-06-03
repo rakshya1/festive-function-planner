@@ -1,9 +1,9 @@
+
 import React, { useState } from "react";
 import Navbar from "@/components/Navbar";
 import EventCard, { EventProps } from "@/components/EventCard";
+import SearchBar from "@/components/SearchBar";
 import { Button } from "@/components/ui/button";
-import { Search } from "lucide-react";
-import { Input } from "@/components/ui/input";
 
 // Sample event data - Nepal focused
 const sampleEvents: EventProps[] = [
@@ -76,19 +76,35 @@ const categories = [
 const Index = () => {
   const [filteredEvents, setFilteredEvents] = useState(sampleEvents);
   const [activeCategory, setActiveCategory] = useState("All");
-  const [searchTerm, setSearchTerm] = useState("");
   
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSearch = (filters: {
+    searchTerm: string;
+    location: string;
+    date: string;
+  }) => {
     let filtered = [...sampleEvents];
     
-    // Filter by search term (title, location, category)
-    if (searchTerm?.trim()) {
-      const term = searchTerm.toLowerCase();
+    // Filter by search term (title, category)
+    if (filters.searchTerm?.trim()) {
+      const term = filters.searchTerm.toLowerCase();
       filtered = filtered.filter(event => 
         event.title.toLowerCase().includes(term) ||
-        event.location.toLowerCase().includes(term) ||
         event.category.toLowerCase().includes(term)
+      );
+    }
+    
+    // Filter by location
+    if (filters.location?.trim()) {
+      const locationTerm = filters.location.toLowerCase();
+      filtered = filtered.filter(event => 
+        event.location.toLowerCase().includes(locationTerm)
+      );
+    }
+    
+    // Filter by date
+    if (filters.date) {
+      filtered = filtered.filter(event => 
+        event.date === filters.date
       );
     }
     
@@ -115,7 +131,7 @@ const Index = () => {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Navbar />
       
-      {/* Hero Section - Enhanced for better responsiveness */}
+      {/* Hero Section */}
       <section className="py-8 sm:py-12 lg:py-16 px-4 sm:px-6 md:px-10 gradient-bg text-white">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-8 sm:mb-10 lg:mb-12 animate-fade-in">
@@ -127,38 +143,19 @@ const Index = () => {
             </p>
           </div>
           
-          {/* Simple Search Bar */}
-          <div className="w-full max-w-2xl mx-auto">
-            <form onSubmit={handleSearch} className="flex gap-2 bg-white dark:bg-gray-800 rounded-lg p-2 shadow-lg">
-              <div className="flex-1 flex items-center gap-2 px-3">
-                <Search className="h-5 w-5 text-gray-400 flex-shrink-0" />
-                <Input 
-                  type="text" 
-                  placeholder="Search events by name, location, or category..." 
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="border-none shadow-none focus-visible:ring-0 text-base"
-                />
-              </div>
-              <Button 
-                type="submit" 
-                className="gradient-bg px-6"
-              >
-                Search
-              </Button>
-            </form>
-          </div>
+          {/* Enhanced Search Bar */}
+          <SearchBar onSearch={handleSearch} />
         </div>
       </section>
       
-      {/* Events Section - Enhanced spacing and responsiveness */}
+      {/* Events Section */}
       <section className="py-8 sm:py-10 lg:py-12 px-4 sm:px-6 md:px-10">
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-4">
             <h2 className="text-xl sm:text-2xl font-semibold">Upcoming Events</h2>
           </div>
           
-          {/* Responsive Category Filters */}
+          {/* Category Filters */}
           <div className="mb-6 sm:mb-8">
             <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
               {categories.map(category => (
