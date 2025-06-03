@@ -1,131 +1,97 @@
 
 import React, { useState } from "react";
 import Navbar from "@/components/Navbar";
-import EventCard, { EventProps } from "@/components/EventCard";
+import EventCard from "@/components/EventCard";
 import SearchBar from "@/components/SearchBar";
 import { Button } from "@/components/ui/button";
-
-// Sample event data - Nepal focused
-const sampleEvents: EventProps[] = [
-  {
-    id: "1",
-    title: "Tech Conference 2025",
-    date: "2025-06-15",
-    time: "9:00 AM - 5:00 PM",
-    location: "Kathmandu Convention Center",
-    imageUrl: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80",
-    category: "Technology",
-    price: "2500"
-  },
-  {
-    id: "2",
-    title: "Music Festival Weekend",
-    date: "2025-07-22",
-    time: "12:00 PM - 11:00 PM",
-    location: "Tundikhel Ground, Kathmandu",
-    imageUrl: "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80",
-    category: "Music",
-    price: "1200"
-  },
-  {
-    id: "3",
-    title: "Startup Networking Mixer",
-    date: "2025-06-05",
-    time: "6:30 PM - 9:00 PM",
-    location: "Durbarmarg Innovation Hub",
-    imageUrl: "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80",
-    category: "Networking",
-    price: "Free"
-  },
-  {
-    id: "4",
-    title: "Charity Run for Education",
-    date: "2025-08-10",
-    time: "7:00 AM - 11:00 AM",
-    location: "Shivapuri National Park",
-    imageUrl: "https://images.unsplash.com/photo-1547483238-2cbf881a559f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80",
-    category: "Sports",
-    price: "200"
-  },
-  {
-    id: "5",
-    title: "Art Exhibition Opening",
-    date: "2025-06-30",
-    time: "5:00 PM - 9:00 PM",
-    location: "Nepal Art Council, Babar Mahal",
-    imageUrl: "https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80",
-    category: "Art",
-    price: "150"
-  },
-  {
-    id: "6",
-    title: "Food & Wine Festival",
-    date: "2025-07-10",
-    time: "12:00 PM - 8:00 PM",
-    location: "Bhrikutimandap Exhibition Hall",
-    imageUrl: "https://images.unsplash.com/photo-1527269534026-c86f4009eace?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80",
-    category: "Food",
-    price: "800"
-  }
-];
+import { useEvents } from "@/hooks/useEvents";
 
 const categories = [
   "All", "Technology", "Music", "Networking", "Sports", "Art", "Food", "Business"
 ];
 
 const Index = () => {
-  const [filteredEvents, setFilteredEvents] = useState(sampleEvents);
+  const { events, loading, error, searchEvents } = useEvents();
+  const [filteredEvents, setFilteredEvents] = useState(events);
   const [activeCategory, setActiveCategory] = useState("All");
   
-  const handleSearch = (filters: {
+  // Update filtered events when events change
+  React.useEffect(() => {
+    setFilteredEvents(events);
+  }, [events]);
+  
+  const handleSearch = async (filters: {
     searchTerm: string;
     location: string;
     date: string;
   }) => {
-    let filtered = [...sampleEvents];
+    console.log('Handling search with filters:', filters);
     
-    // Filter by search term (title, category)
-    if (filters.searchTerm?.trim()) {
-      const term = filters.searchTerm.toLowerCase();
-      filtered = filtered.filter(event => 
-        event.title.toLowerCase().includes(term) ||
-        event.category.toLowerCase().includes(term)
-      );
+    try {
+      // If all filters are empty, show all events
+      if (!filters.searchTerm && !filters.location && !filters.date) {
+        setFilteredEvents(events);
+        setActiveCategory("All");
+        return;
+      }
+
+      // Use the searchEvents function from useEvents hook
+      const results = await searchEvents({
+        searchTerm: filters.searchTerm,
+        location: filters.location,
+        date: filters.date
+      });
+      
+      setFilteredEvents(results);
+      setActiveCategory("All");
+    } catch (err) {
+      console.error('Search error:', err);
+      setFilteredEvents([]);
     }
-    
-    // Filter by location
-    if (filters.location?.trim()) {
-      const locationTerm = filters.location.toLowerCase();
-      filtered = filtered.filter(event => 
-        event.location.toLowerCase().includes(locationTerm)
-      );
-    }
-    
-    // Filter by date
-    if (filters.date) {
-      filtered = filtered.filter(event => 
-        event.date === filters.date
-      );
-    }
-    
-    setFilteredEvents(filtered);
-    setActiveCategory("All");
   };
   
   const filterByCategory = (category: string) => {
     setActiveCategory(category);
     
     if (category === "All") {
-      setFilteredEvents(sampleEvents);
+      setFilteredEvents(events);
       return;
     }
     
-    const filtered = sampleEvents.filter(event => 
+    const filtered = events.filter(event => 
       event.category === category
     );
     
     setFilteredEvents(filtered);
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <Navbar />
+        <div className="flex items-center justify-center min-h-[50vh]">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-600 dark:text-gray-400">Loading events...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <Navbar />
+        <div className="flex items-center justify-center min-h-[50vh]">
+          <div className="text-center">
+            <p className="text-red-600 dark:text-red-400 mb-4">{error}</p>
+            <Button onClick={() => window.location.reload()}>Try Again</Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
   
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -153,6 +119,9 @@ const Index = () => {
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-4">
             <h2 className="text-xl sm:text-2xl font-semibold">Upcoming Events</h2>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              {filteredEvents.length} event{filteredEvents.length !== 1 ? 's' : ''} found
+            </p>
           </div>
           
           {/* Category Filters */}
