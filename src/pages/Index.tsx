@@ -11,7 +11,7 @@ const categories = [
 ];
 
 const Index = () => {
-  const { events, loading, error, searchEvents } = useEvents();
+  const { events, loading, error } = useEvents();
   const [filteredEvents, setFilteredEvents] = useState(events);
   const [activeCategory, setActiveCategory] = useState("All");
   
@@ -20,34 +20,43 @@ const Index = () => {
     setFilteredEvents(events);
   }, [events]);
   
-  const handleSearch = async (filters: {
+  const handleSearch = (filters: {
     searchTerm: string;
     location: string;
     date: string;
   }) => {
     console.log('Handling search with filters:', filters);
     
-    try {
-      // If all filters are empty, show all events
-      if (!filters.searchTerm && !filters.location && !filters.date) {
-        setFilteredEvents(events);
-        setActiveCategory("All");
-        return;
-      }
-
-      // Use the searchEvents function from useEvents hook
-      const results = await searchEvents({
-        searchTerm: filters.searchTerm,
-        location: filters.location,
-        date: filters.date
-      });
-      
-      setFilteredEvents(results);
-      setActiveCategory("All");
-    } catch (err) {
-      console.error('Search error:', err);
-      setFilteredEvents([]);
+    let filtered = [...events];
+    
+    // Apply search term filter
+    if (filters.searchTerm) {
+      const searchLower = filters.searchTerm.toLowerCase();
+      filtered = filtered.filter(event => 
+        event.title.toLowerCase().includes(searchLower) ||
+        event.category.toLowerCase().includes(searchLower) ||
+        event.location.toLowerCase().includes(searchLower)
+      );
     }
+    
+    // Apply location filter
+    if (filters.location) {
+      const locationLower = filters.location.toLowerCase();
+      filtered = filtered.filter(event => 
+        event.location.toLowerCase().includes(locationLower)
+      );
+    }
+    
+    // Apply date filter
+    if (filters.date) {
+      filtered = filtered.filter(event => 
+        event.date === filters.date
+      );
+    }
+    
+    setFilteredEvents(filtered);
+    setActiveCategory("All");
+    console.log('Search results:', filtered);
   };
   
   const filterByCategory = (category: string) => {
@@ -109,7 +118,7 @@ const Index = () => {
             </p>
           </div>
           
-          {/* Enhanced Search Bar */}
+          {/* New Search Bar */}
           <SearchBar onSearch={handleSearch} />
         </div>
       </section>
